@@ -5,7 +5,11 @@
 <title>QA Portal2</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
 body{
   font-family:Segoe UI,Arial;
@@ -15,118 +19,289 @@ body{
   transition:.3s;
 }
 
+/* LIGHT MODE */
 body.light{
   background:#f4f6fb;
   color:#111;
 }
 
+body.light .sidebar{background:#fff;}
+body.light .card{background:#fff;color:#111;}
+body.light .section-title{color:#333;}
+body.light .nav a{color:#333;}
+body.light .nav a.active{background:#e6e9f5;}
+body.light .sidebar-section h4{color:#333;}
+body.light .small-btn{background:#e6e9f5;color:#111;}
+body.light .switch{
+  background:#fff;
+  color:#111;
+}
+
+/* SIDEBAR */
 .sidebar{
   width:220px;
   background:#151521;
   min-height:100vh;
   position:fixed;
-  left:0;top:0;
+  left:0;
+  top:0;
   padding:20px;
 }
 
-.logo{display:flex;gap:10px;align-items:center;margin-bottom:15px;}
-.logo img{width:30px;height:30px;}
+.logo{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.logo img{
+  width:30px;
+  height:30px;
+}
 
 .nav a{
   display:block;
   padding:10px;
   color:#aaa;
   cursor:pointer;
+  border-radius:8px;
 }
-.nav a.active{background:#2c2c3e;color:#fff;}
 
+.nav a.active{
+  background:#2c2c3e;
+  color:#fff;
+}
+
+/* MAIN */
 .main{
   margin-left:220px;
   padding:30px;
   width:100%;
 }
 
-.section{display:none;}
-.section-title{margin:10px 0;}
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.section-title{
+  color:#aaa;
+  margin:10px 0;
+}
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:10px;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:15px;
 }
 
+/* CARD */
 .card{
   background:#2c2c3e;
-  height:140px;
+  height:150px;
+  border-radius:14px;
   display:flex;
-  align-items:center;
-  justify-content:center;
   flex-direction:column;
+  justify-content:center;
+  align-items:center;
   position:relative;
   cursor:pointer;
+  overflow:hidden;
 }
 
-.card img{width:30px;}
+.card.new{
+  animation:pulseGlow 1.6s ease-out 1;
+}
 
+@keyframes pulseGlow{
+  0%{box-shadow:0 0 0 rgba(255,59,59,0);}
+  50%{box-shadow:0 0 18px rgba(255,59,59,0.55);}
+  100%{box-shadow:0 0 0 rgba(255,59,59,0);}
+}
+
+/* NEW ribbon */
 .new-ribbon{
   position:absolute;
-  top:10px;
-  right:-30px;
-  background:red;
-  transform:rotate(45deg);
-  padding:3px 25px;
+  top:12px;
+  right:-32px;
+  background:#ff3b3b;
+  color:#fff;
   font-size:10px;
+  padding:4px 38px;
+  transform:rotate(45deg);
+  font-weight:bold;
 }
 
+/* TEST ribbon */
 .test-ribbon{
   position:absolute;
-  top:35px;
-  right:-30px;
-  background:gold;
-  transform:rotate(45deg);
-  padding:3px 25px;
+  top:12px;
+  left:-32px;
+  background:#ffd500;
+  color:#111;
   font-size:10px;
+  padding:4px 38px;
+  transform:rotate(-45deg);
+  font-weight:bold;
 }
 
+/* FAVORITE BUTTON */
+.fav-btn{
+  margin-top:8px;
+  padding:6px 10px;
+  border:none;
+  border-radius:8px;
+  font-size:11px;
+  cursor:pointer;
+  background:#1f1f2d;
+  color:#aaa;
+  transition:.2s;
+}
+
+.fav-btn:hover{
+  background:#3a3a55;
+  color:#fff;
+}
+
+.fav-btn.active{
+  background:gold;
+  color:#111;
+  font-weight:bold;
+}
+
+/* POP EFFECT */
+.fav-btn.pop{
+  animation:pop .3s ease;
+}
+
+@keyframes pop{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.3);}
+  100%{transform:scale(1);}
+}
+
+.card img{
+  width:32px;
+  height:32px;
+  margin-bottom:8px;
+}
+
+.card-title{
+  font-size:13px;
+  text-align:center;
+}
+
+/* SIDEBAR LIST */
+.sidebar-section{
+  margin-top:20px;
+}
+
+.sidebar-section h4{
+  font-size:12px;
+  color:#777;
+  margin-bottom:8px;
+}
+
+.sidebar-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  margin-bottom:6px;
+}
+
+.sidebar-item img{
+  width:18px;
+  height:18px;
+}
+
+/* BUTTON */
+.small-btn{
+  margin-top:8px;
+  width:100%;
+  padding:6px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#2c2c3e;
+  color:#fff;
+}
+
+/* TOPBAR */
 .topbar{
   position:fixed;
   right:10px;
   top:10px;
 }
 
-.switch{display:flex;gap:8px;cursor:pointer;}
+/* THEME SWITCH */
+.switch{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#2c2c3e;
+  padding:8px 14px;
+  border-radius:30px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.switch input{
+  display:none;
+}
+
 .slider{
-  width:40px;height:20px;
-  background:#444;
+  width:46px;
+  height:24px;
+  background:#555;
   border-radius:20px;
   position:relative;
-}
-.slider:before{
-  content:"";
-  width:16px;height:16px;
-  background:#fff;
-  position:absolute;
-  top:2px;left:2px;
-  border-radius:50%;
   transition:.3s;
 }
+
+.slider:before{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:#fff;
+  border-radius:50%;
+  left:3px;
+  top:3px;
+  transition:.3s;
+}
+
+.switch input:checked + .slider{
+  background:#4caf50;
+}
+
 .switch input:checked + .slider:before{
-  transform:translateX(20px);
+  transform:translateX(22px);
 }
 </style>
 </head>
 
 <body>
 
+<!-- TOP -->
 <div class="topbar">
-  <label class="switch">
-    <input type="checkbox" onchange="toggleTheme()">
-    <div class="slider"></div>
-    <span id="themeText">🌙 Dark</span>
-  </label>
+
+<label class="switch">
+  <input type="checkbox" onchange="toggleTheme()">
+  <div class="slider"></div>
+  <span id="themeText">🌙 Dark</span>
+</label>
+
 </div>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
+
   <div class="logo">
     <img src="logo.png">
     <strong>Portal</strong>
@@ -136,11 +311,24 @@ body.light{
     <a class="active" onclick="show('all',this)">Dashboard</a>
     <a onclick="show('tp',this)">TP Tools</a>
     <a onclick="show('qa',this)">QA Tools</a>
-    <a onclick="show('reports',this)">Reports</a>
-    <a onclick="show('office',this)">Office</a>
+    <a onclick="show('reports',this)">Power BI Reports</a>
+    <a onclick="show('office',this)">Microsoft Office</a>
   </div>
+
+  <div class="sidebar-section">
+    <h4>Favoriler ⭐</h4>
+    <div id="favList"></div>
+    <button class="small-btn" onclick="clearFav()">Temizle</button>
+  </div>
+
+  <div class="sidebar-section">
+    <h4>Son Kullanılan</h4>
+    <div id="recentList"></div>
+  </div>
+
 </div>
 
+<!-- MAIN -->
 <div class="main">
 <h2>Dashboard</h2>
 <div id="app"></div>
@@ -148,66 +336,260 @@ body.light{
 
 <script>
 
+/* DATA */
 const tools=[
-  {id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,isTest:0,url:"#"},
-  {id:"csv",name:"CSV",icon:"logo.png",cat:"qa",isNew:1,isTest:1,url:"csvconverter.html"}
+
+  {id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,isTest:0,url:"https://sebra.ccms.teleperformance.com/"},
+
+  {id:"mytp",name:"MYTP",icon:"mytp.png",cat:"tp",isNew:0,isTest:0,url:"https://teleperformance-mytp.sabacloud.com/"},
+
+  {id:"csv",name:"CSV Converter",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"csvconverter.html"},
+
+  {id:"random",name:"Randomizer",icon:"logo.png",cat:"qa",isNew:1,isTest:1,url:"randomizer.html"},
+
+  {id:"corel",name:"Correlation",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"corel.html"},
+
+  {id:"sampling",name:"Sampling Tool",icon:"logo.png",cat:"qa",isNew:0,isTest:1,url:"sampling.html"},
+
+  {
+    id:"powerbifb",
+    name:"Feedback Raporu",
+    icon:"powerbi.png",
+    cat:"reports",
+    isNew:0,
+    isTest:0,
+    url:"https://app.powerbi.com/"
+  },
+
+  {
+    id:"powerbidm",
+    name:"Domestic - Kalite Raporu",
+    icon:"powerbi.png",
+    cat:"reports",
+    isNew:0,
+    isTest:0,
+    url:"https://app.powerbi.com/"
+  },
+
+  {
+    id:"excel",
+    name:"Excel",
+    icon:"excel.png",
+    cat:"office",
+    isNew:0,
+    isTest:0,
+    url:"https://excel.cloud.microsoft/"
+  },
+
+  {
+    id:"ppt",
+    name:"PowerPoint",
+    icon:"powerpoint.png",
+    cat:"office",
+    isNew:0,
+    isTest:0,
+    url:"https://powerpoint.cloud.microsoft/"
+  },
+
+  {
+    id:"word",
+    name:"Word",
+    icon:"word.png",
+    cat:"office",
+    isNew:0,
+    isTest:0,
+    url:"https://word.cloud.microsoft/"
+  }
+
 ];
 
+/* THEME */
 function toggleTheme(){
+
   document.body.classList.toggle("light");
-  document.getElementById("themeText").innerText =
-    document.body.classList.contains("light") ? "☀️ Light" : "🌙 Dark";
+
+  themeText.innerText =
+    document.body.classList.contains("light")
+    ? "☀️ Light"
+    : "🌙 Dark";
 }
 
+/* RENDER */
 function render(){
+
   const app=document.getElementById("app");
+
   app.innerHTML="";
 
-  ["tp","qa"].forEach(cat=>{
+  ["tp","qa","reports","office"].forEach(cat=>{
+
     let sec=document.createElement("div");
-    sec.className="section";
+
+    sec.className="section active";
+
     sec.dataset.cat=cat;
 
     sec.innerHTML=`
       <div class="section-title">${cat.toUpperCase()}</div>
+
       <div class="grid">
-        ${tools.filter(t => t.cat === cat).map(t => card(t)).join("")}
+        ${tools.filter(t=>t.cat===cat).map(card).join("")}
       </div>
     `;
 
     app.appendChild(sec);
+
   });
+
+  updateFav();
+  updateRecent();
 }
 
+/* CARD */
 function card(t){
+
+  let fav=getFav();
+
+  let isFav=fav.includes(t.id);
+
   return `
-  <div class="card" onclick="openTool('${t.id}')">
-    ${t.isNew ? '<div class="new-ribbon">NEW</div>' : ''}
-    ${t.isTest ? '<div class="test-ribbon">TEST</div>' : ''}
-    <img src="${tme}</div>
+  <div class="card ${t.isNew?'new':''}" onclick="openTool('${t.id}')">
+
+    ${t.isNew?'<div class="new-ribbon">NEW</div>':''}
+
+    ${t.isTest?'<div class="test-ribbon">TEST</div>':''}
+
+    <img src="${t.icon}">
+
+    <div class="card-title">${t.name}</div>
+
+    <button class="fav-btn ${isFav?'active':''}"
+      onclick="event.stopPropagation();toggleFav('${t.id}',this)">
+      ${isFav ? "★ Favoride" : "☆ Favori"}
+    </button>
+
   </div>`;
 }
 
+/* FAVORITE */
+function getFav(){
+  return JSON.parse(localStorage.getItem("fav")||"[]");
+}
+
+function toggleFav(id, btn){
+
+  let fav=getFav();
+
+  const add=!fav.includes(id);
+
+  if(add){
+
+    fav.push(id);
+
+    if(btn){
+
+      btn.classList.add("pop");
+
+      setTimeout(()=>btn.classList.remove("pop"),300);
+    }
+
+  } else {
+
+    fav=fav.filter(x=>x!==id);
+  }
+
+  localStorage.setItem("fav",JSON.stringify(fav));
+
+  render();
+}
+
+function clearFav(){
+
+  localStorage.removeItem("fav");
+
+  render();
+}
+
+function updateFav(){
+
+  let fav=getFav();
+
+  document.getElementById("favList").innerHTML=
+    fav.map(id=>{
+
+      let t=tools.find(x=>x.id===id);
+
+      return t
+      ? `<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`
+      : "";
+
+    }).join("");
+}
+
+/* RECENT */
 function openTool(id){
+
   let t=tools.find(x=>x.id===id);
+
+  if(!t) return;
+
+  let r=JSON.parse(localStorage.getItem("recent") || "[]");
+
+  r=r.filter(x=>x!==id);
+
+  r.unshift(id);
+
+  r=r.slice(0,5);
+
+  localStorage.setItem("recent", JSON.stringify(r));
+
+  updateRecent();
+
   if(t.url.endsWith(".html")){
-    location.href=t.url;
-  }else{
-    window.open(t.url,"_blank");
+
+    window.location.href=t.url;
+
+  } else {
+
+    window.open(t.url, "_blank");
   }
 }
 
-function show(cat,el){
-  document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
+function updateRecent(){
+
+  let r=JSON.parse(localStorage.getItem("recent")||"[]");
+
+  document.getElementById("recentList").innerHTML=
+    r.map(id=>{
+
+      let t=tools.find(x=>x.id===id);
+
+      return t
+      ? `<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`
+      : "";
+
+    }).join("");
+}
+
+/* NAV */
+function show(id,el){
+
+  document.querySelectorAll(".nav a")
+    .forEach(a=>a.classList.remove("active"));
+
   el.classList.add("active");
 
   document.querySelectorAll(".section").forEach(s=>{
-    s.style.display=(cat==="all"||s.dataset.cat===cat)?"block":"none";
+
+    s.style.display =
+      (id==="all" || s.dataset.cat===id)
+      ? "block"
+      : "none";
   });
 }
 
+/* INIT */
 render();
-show("all", document.querySelector(".nav a"));
 
 </script>
 
