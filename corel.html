@@ -2,89 +2,706 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>v14 Excel Parity Dashboard</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korelasyon Analizi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#0f1115;
-color:#fff;
+/* ── BASE (dark default, projenizle aynı) ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #1e1e2f;
+  color: white;
+  transition: background .3s, color .3s;
+}
+body.light {
+  background: #f5f5f5;
+  color: #222;
 }
 
-.topbar{
-display:flex;
-justify-content:space-between;
-padding:10px;
-background:#1a1d25;
-position:sticky;
-top:0;
+/* ── HEADER ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #2c2c3e;
+}
+body.light .header { background: #ddd; }
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-title { font-size: 16px; font-weight: bold; }
+
+.header-right {
+  display: flex;
+  gap: 15px;
+  align-items: center;
 }
 
-.container{padding:10px;display:grid;gap:10px}
+/* Geri butonu — projenizden birebir */
+#backBtnPlain {
+  background: transparent;
+  border: 1px solid #888;
+  color: inherit;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+#backBtnPlain:hover { background: rgba(255,255,255,0.1); }
+body.light #backBtnPlain:hover { background: rgba(0,0,0,0.05); }
 
-.card{background:#1a1d25;padding:10px;border-radius:8px}
+/* Dark/Light toggle — projenizden birebir */
+.switch { display: flex; gap: 6px; align-items: center; font-size: 12px; cursor: pointer; }
+.switch input { display: none; }
+.slider {
+  width: 40px; height: 20px;
+  background: #666; border-radius: 20px;
+  position: relative; cursor: pointer;
+}
+.slider:before {
+  content: "";
+  width: 16px; height: 16px;
+  background: white;
+  position: absolute; top: 2px; left: 2px;
+  border-radius: 50%; transition: .3s;
+}
+input:checked + .slider { background: #4CAF50; }
+input:checked + .slider:before { transform: translateX(20px); }
 
-.ai{
-white-space:pre-line;
-border-left:4px solid #00ffd5;
-padding:10px;
-background:#121826;
+/* ── CONTAINER ── */
+.container {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 30px;
+  background: #2c2c3e;
+  border-radius: 12px;
+}
+body.light .container { background: white; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+
+.container h2 {
+  font-size: 20px;
+  margin-bottom: 24px;
+  color: #4CAF50;
 }
 
-table{
-border-collapse:collapse;
-font-size:10px;
-width:100%;
+/* ── DROP ZONE ── */
+.drop {
+  border: 2px dashed #555;
+  padding: 40px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 15px;
+  transition: border-color .2s, background .2s;
+}
+.drop:hover, .drop.drag {
+  border-color: #4CAF50;
+  background: rgba(76,175,80,0.08);
+}
+body.light .drop { border-color: #bbb; }
+body.light .drop:hover, body.light .drop.drag { border-color: #4CAF50; }
+
+/* ── META CARDS (projenizin .card sisteminden) ── */
+.cards {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.card {
+  flex: 1;
+  min-width: 120px;
+  background: #1e1e2f;
+  padding: 12px 16px;
+  border-radius: 10px;
+}
+body.light .card { background: #f0f0f0; }
+.card-label { font-size: 11px; color: #aaa; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+body.light .card-label { color: #777; }
+.card-value { font-size: 22px; font-weight: bold; color: #4CAF50; }
+
+/* ── CONTROLS ROW ── */
+.controls-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+.ctrl-group { flex: 1; min-width: 180px; }
+.ctrl-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+body.light .ctrl-label { color: #666; }
+
+select {
+  width: 100%;
+  background: #1e1e2f;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: inherit;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  cursor: pointer;
+}
+body.light select { background: #f5f5f5; border-color: #ccc; color: #222; }
+select:focus { border-color: #4CAF50; }
+
+/* Sütun etiketleri */
+.cols-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.col-tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid #444;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #aaa;
+  background: #1e1e2f;
+  transition: all .15s;
+  user-select: none;
+}
+body.light .col-tag { background: #eee; border-color: #ccc; color: #666; }
+.col-tag.on { border-color: #4CAF50; color: #4CAF50; background: rgba(76,175,80,.1); }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 12px 24px;
+  background: #4CAF50;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: opacity .15s;
+  margin-top: 6px;
+}
+.btn:hover { opacity: .88; }
+.btn-outline {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #888;
+  color: inherit;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all .15s;
+}
+.btn-outline:hover { border-color: #4CAF50; color: #4CAF50; }
+
+/* ── STATUS ── */
+.status { margin-top: 12px; color: #bbb; font-size: 13px; min-height: 18px; }
+.status.err { color: #e53935; }
+
+/* ── RESULTS SECTION ── */
+#results { display: none; margin-top: 32px; }
+
+.section-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-td,th{
-border:1px solid #2a2f3a;
-padding:3px;
-text-align:center;
+/* ── HEATMAP ── */
+.heatmap-wrap {
+  background: #1e1e2f;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 24px;
+  overflow-x: auto;
 }
+body.light .heatmap-wrap { background: #f5f5f5; }
+#heatmapCanvas { display: block; width: 100%; cursor: crosshair; }
 
-th{position:sticky;top:0;background:#111}
-
-input,button{
-background:#222;
-color:#fff;
-border:1px solid #333;
-padding:5px;
+/* Legant */
+.legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
 }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #aaa; }
+body.light .legend-item { color: #555; }
+.legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(255,255,255,.1); flex-shrink: 0; }
 
-button{cursor:pointer}
+/* ── TABLE ── */
+.table-wrap {
+  background: #1e1e2f;
+  border-radius: 10px;
+  padding: 16px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+body.light .table-wrap { background: #f5f5f5; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+th {
+  border: 1px solid #333;
+  padding: 8px 10px;
+  background: #2c2c3e;
+  color: #ccc;
+  font-weight: bold;
+  white-space: nowrap;
+  text-align: center;
+}
+th:first-child { text-align: left; min-width: 160px; }
+body.light th { border-color: #ddd; background: #e8e8e8; color: #333; }
+td {
+  border: 1px solid #333;
+  padding: 7px 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+body.light td { border-color: #ddd; }
+
+/* ── TOOLTIP ── */
+#tooltip {
+  position: fixed;
+  display: none;
+  background: #111827;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: white;
+  pointer-events: none;
+  z-index: 999;
+  line-height: 1.8;
+}
+body.light #tooltip { background: #fff; color: #222; border-color: #ccc; }
+
+/* ── LOG SECTION (projenizden aynı) ── */
+.log-section {
+  margin-top: 32px;
+  text-align: left;
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 12px;
+}
+body.light .log-section { background: rgba(0,0,0,0.04); }
+.log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.log-list {
+  max-height: 180px;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.2);
+  line-height: 1.8;
+}
+body.light .log-list { background: white; }
+.log-item { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px; color: #ccc; }
+body.light .log-item { color: #444; border-color: #eee; }
+.clear-btn {
+  background: #e53935; color: white; border: none;
+  padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold;
+}
+.clear-btn:hover { opacity: .88; }
 </style>
 </head>
-
 <body>
 
-<div class="topbar">
-<div>📊 v14 Excel Parity Engine</div>
-
-<div>
-<input id="projectName" placeholder="Proje adı">
-<button onclick="run()">Run</button>
-<button onclick="exportExcel()">Export</button>
-<input type="file" id="fileInput">
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <button id="backBtnPlain" onclick="history.back()">⬅ Geri</button>
+    <span class="header-title">📊 Korelasyon Analizi</span>
+  </div>
+  <div class="header-right">
+    <label class="switch">
+      <input type="checkbox" id="themeToggle">
+      <div class="slider"></div>
+      <span id="themeText">🌙 Dark</span>
+    </label>
+  </div>
 </div>
-</div>
 
+<!-- MAIN CONTAINER -->
 <div class="container">
+  <h2>📈 Korelasyon Matrisi</h2>
 
-<div id="aiBox" class="ai"></div>
+  <!-- DROP ZONE -->
+  <div class="drop" id="drop">📥 Dosya seç veya sürükle (.csv · .xlsx · .xls)</div>
+  <input type="file" id="fileInput" hidden accept=".csv,.xlsx,.xls">
 
-<div class="card">
-<canvas id="chart"></canvas>
-</div>
+  <div class="status" id="status">Bekleniyor...</div>
 
-<div class="card" id="table"></div>
+  <!-- META CARDS -->
+  <div class="cards" id="metaCards" style="display:none"></div>
 
-</div>
+  <!-- CONTROLS -->
+  <div id="controls" style="display:none">
+    <div class="controls-row">
+      <div class="ctrl-group">
+        <div class="ctrl-label">Korelasyon Yöntemi</div>
+        <select id="methodSel">
+          <option value="pearson">Pearson — doğrusal ilişki</option>
+          <option value="spearman">Spearman — sıra tabanlı</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Sütunları Seç / Çıkar</div>
+        <div class="cols-wrap" id="colTags"></div>
+      </div>
+    </div>
+    <button class="btn" id="runBtn">▶ Analizi Çalıştır</button>
+  </div>
 
-<script src="corelscript.js"></script>
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- HEATMAP -->
+    <div class="heatmap-wrap">
+      <div class="section-title">
+        <span>🗺 Isı Haritası</span>
+        <button class="btn-outline" id="exportPng">⬇ PNG İndir</button>
+      </div>
+      <canvas id="heatmapCanvas" role="img" aria-label="Korelasyon ısı haritası"></canvas>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-swatch" style="background:#FB80B0"></div>≤ −0.7 (çok güçlü negatif)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#FED3E4"></div>−0.7 → −0.4 (orta negatif)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#444"></div>|r| &lt; 0.4 (zayıf)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#BBFFF7"></div>+0.4 → +0.7 (orta pozitif)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#35FFE6"></div>≥ +0.7 (çok güçlü pozitif)</div>
+      </div>
+    </div>
+
+    <!-- TABLE + XLSX -->
+    <div class="section-title">
+      <span>📋 Korelasyon Tablosu</span>
+      <button class="btn" id="exportXlsx">⬇ Excel İndir</button>
+    </div>
+    <div class="table-wrap">
+      <div id="tableWrap"></div>
+    </div>
+
+    <!-- LOG -->
+    <div class="log-section">
+      <div class="log-header">
+        <span style="font-weight:bold;font-size:14px">📝 Analiz Geçmişi</span>
+        <button class="clear-btn" id="clearLog">🗑 Temizle</button>
+      </div>
+      <div class="log-list" id="logList">
+        <div class="log-item" style="color:#666;font-style:italic">Henüz analiz yapılmadı.</div>
+      </div>
+    </div>
+
+  </div><!-- /results -->
+</div><!-- /container -->
+
+<div id="tooltip"></div>
+
+<script>
+/* ── THEME TOGGLE (projenizden birebir) ── */
+const themeToggle = document.getElementById('themeToggle');
+const themeText   = document.getElementById('themeText');
+themeToggle.addEventListener('change', () => {
+  document.body.classList.toggle('light', themeToggle.checked);
+  themeText.textContent = themeToggle.checked ? '☀️ Light' : '🌙 Dark';
+  if (corrMatrix.length) drawHeatmap(colsUsed, corrMatrix);
+});
+
+/* ── RENK KURALLARI ── */
+const RULES = [
+  { test: v => v <= -0.7,              bg: 'FB80B0', fg: '000000' },
+  { test: v => v > -0.7 && v < -0.4,  bg: 'FED3E4', fg: '000000' },
+  { test: v => v >= -0.4 && v < 0.4,  bg: null,     fg: null     },
+  { test: v => v >= 0.4 && v < 0.7,   bg: 'BBFFF7', fg: '000000' },
+  { test: v => v >= 0.7,              bg: '35FFE6', fg: '000000' },
+];
+function getRule(v) { return RULES.find(r => r.test(v)) || RULES[2]; }
+
+/* ── STATE ── */
+let rawData = [], numericCols = [], selectedCols = [], corrMatrix = [], colsUsed = [], logItems = [];
+
+/* ── DOM ── */
+const drop     = document.getElementById('drop');
+const fileInput= document.getElementById('fileInput');
+const statusEl = document.getElementById('status');
+const tooltip  = document.getElementById('tooltip');
+
+/* ── DROP / FILE ── */
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover',  e => { e.preventDefault(); drop.classList.add('drag'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+function setStatus(msg, err = false) {
+  statusEl.textContent = msg;
+  statusEl.className = 'status' + (err ? ' err' : '');
+}
+
+function handleFile(file) {
+  if (!file) return;
+  setStatus('Dosya okunuyor...');
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'csv') {
+    const r = new FileReader();
+    r.onload = ev => {
+      const res = Papa.parse(ev.target.result, { header: true, dynamicTyping: true, skipEmptyLines: true });
+      loadData(res.data, res.meta.fields, file.name);
+    };
+    r.readAsText(file, 'UTF-8');
+  } else if (['xlsx','xls'].includes(ext)) {
+    const r = new FileReader();
+    r.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(ws, { defval: null });
+      loadData(json, json.length ? Object.keys(json[0]) : [], file.name);
+    };
+    r.readAsArrayBuffer(file);
+  } else {
+    setStatus('Desteklenmeyen format. Lütfen .csv / .xlsx / .xls yükleyin.', true);
+  }
+}
+
+function loadData(data, fields, name) {
+  rawData = data;
+  numericCols = fields.filter(f => {
+    const vals = data.map(r => r[f]).filter(v => v !== null && v !== '' && v !== undefined);
+    return vals.length > 0 && vals.every(v => !isNaN(parseFloat(v)));
+  });
+  if (numericCols.length < 2) { setStatus('Hata: en az 2 sayısal sütun gerekli.', true); return; }
+
+  setStatus(`✅ ${name} yüklendi — ${data.length} satır, ${numericCols.length} sayısal sütun`);
+
+  /* KPI kartları */
+  const mc = document.getElementById('metaCards');
+  mc.style.display = 'flex';
+  mc.innerHTML = `
+    <div class="card"><div class="card-label">Satır</div><div class="card-value">${data.length.toLocaleString('tr')}</div></div>
+    <div class="card"><div class="card-label">Toplam Sütun</div><div class="card-value">${fields.length}</div></div>
+    <div class="card"><div class="card-label">Sayısal Sütun</div><div class="card-value">${numericCols.length}</div></div>
+    <div class="card"><div class="card-label">Dosya</div><div class="card-value" style="font-size:13px;margin-top:2px">${name}</div></div>`;
+
+  selectedCols = [...numericCols];
+  const wrap = document.getElementById('colTags'); wrap.innerHTML = '';
+  numericCols.forEach(c => {
+    const t = document.createElement('span'); t.className = 'col-tag on'; t.textContent = c;
+    t.addEventListener('click', () => {
+      const i = selectedCols.indexOf(c);
+      if (i >= 0) { selectedCols.splice(i, 1); t.classList.remove('on'); }
+      else         { selectedCols.push(c);      t.classList.add('on'); }
+    });
+    wrap.appendChild(t);
+  });
+
+  document.getElementById('controls').style.display = 'block';
+  document.getElementById('results').style.display  = 'none';
+}
+
+/* ── STATS ── */
+function colVals(col) { return rawData.map(r => parseFloat(r[col])).filter(v => !isNaN(v)); }
+
+function pearson(xs, ys) {
+  const n = Math.min(xs.length, ys.length);
+  let sx=0,sy=0,sxy=0,sx2=0,sy2=0;
+  for (let i=0;i<n;i++){sx+=xs[i];sy+=ys[i];sxy+=xs[i]*ys[i];sx2+=xs[i]**2;sy2+=ys[i]**2;}
+  const num=n*sxy-sx*sy, den=Math.sqrt((n*sx2-sx**2)*(n*sy2-sy**2));
+  return den===0?0:num/den;
+}
+function rankArr(arr) {
+  const s=arr.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+  const r=new Array(arr.length); let i=0;
+  while(i<s.length){let j=i;while(j<s.length&&s[j].v===s[i].v)j++;const avg=(i+j+1)/2;for(let k=i;k<j;k++)r[s[k].i]=avg;i=j;}
+  return r;
+}
+function spearman(xs,ys){return pearson(rankArr(xs),rankArr(ys));}
+
+/* ── RUN ── */
+document.getElementById('runBtn').addEventListener('click', () => {
+  if (selectedCols.length < 2) { setStatus('En az 2 sütun seçin.', true); return; }
+  const method = document.getElementById('methodSel').value;
+  colsUsed = [...selectedCols];
+  corrMatrix = colsUsed.map(ci => colsUsed.map(cj => {
+    if (ci===cj) return 1;
+    return method==='pearson' ? pearson(colVals(ci),colVals(cj)) : spearman(colVals(ci),colVals(cj));
+  }));
+  drawHeatmap(colsUsed, corrMatrix);
+  buildTable(colsUsed, corrMatrix);
+  addLog(`[${new Date().toLocaleTimeString('tr')}] ${method.toUpperCase()} · ${colsUsed.length} sütun`);
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+  setStatus(`✅ Analiz tamamlandı — ${colsUsed.length}×${colsUsed.length} matris`);
+});
+
+/* ── HEATMAP ── */
+function drawHeatmap(cols, matrix) {
+  const isLight = document.body.classList.contains('light');
+  const n = cols.length;
+  const labelH = Math.min(130, Math.max(80, n * 7));
+  const cell = Math.max(38, Math.min(76, Math.floor((860 - labelH) / n)));
+  const W = labelH + n * cell, H = labelH + n * cell;
+  const canvas = document.getElementById('heatmapCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = isLight ? '#f5f5f5' : '#1e1e2f';
+  ctx.fillRect(0,0,W,H);
+  const fs = Math.max(9, Math.min(12, cell/5));
+  ctx.font = `${fs}px Arial`;
+
+  cols.forEach((c,i) => {
+    ctx.fillStyle = isLight ? '#555' : '#aaa';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.save();
+    ctx.translate(labelH+i*cell+cell/2, labelH-8);
+    ctx.rotate(-Math.PI/4);
+    ctx.fillText(c.length>18?c.slice(0,17)+'…':c, 0, 0);
+    ctx.restore();
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = isLight ? '#555' : '#aaa';
+    ctx.fillText(c.length>22?c.slice(0,21)+'…':c, labelH-8, labelH+i*cell+cell/2);
+  });
+
+  matrix.forEach((row,i) => {
+    row.forEach((val,j) => {
+      const x = labelH+j*cell, y = labelH+i*cell;
+      const rule = getRule(val);
+      ctx.fillStyle = rule.bg ? ('#'+rule.bg) : (isLight ? '#e0e0e0' : '#2c2c3e');
+      ctx.fillRect(x+1,y+1,cell-2,cell-2);
+      ctx.fillStyle = rule.bg ? ('#'+rule.fg) : (isLight?'#222':'#ddd');
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.font = `${i===j?'bold ':''}${fs}px Arial`;
+      ctx.fillText(val.toFixed(2), x+cell/2, y+cell/2);
+    });
+  });
+
+  canvas.onmousemove = e => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W/rect.width, scaleY = H/rect.height;
+    const mx = (e.clientX-rect.left)*scaleX, my = (e.clientY-rect.top)*scaleY;
+    const ci = Math.floor((mx-labelH)/cell), ri = Math.floor((my-labelH)/cell);
+    if (ci>=0&&ci<n&&ri>=0&&ri<n) {
+      const v = matrix[ri][ci];
+      const strength = Math.abs(v)>=0.7?'Güçlü':Math.abs(v)>=0.4?'Orta':'Zayıf';
+      const dir = v>0.01?'pozitif':v<-0.01?'negatif':'ilişki yok';
+      tooltip.style.display='block';
+      tooltip.style.left=(e.clientX+14)+'px';
+      tooltip.style.top=(e.clientY+14)+'px';
+      tooltip.innerHTML=`<b>${cols[ri]}</b><br><b>${cols[ci]}</b><br>r = ${v.toFixed(4)}<br>${strength} ${dir}`;
+    } else { tooltip.style.display='none'; }
+  };
+  canvas.onmouseleave = () => { tooltip.style.display='none'; };
+}
+
+/* ── HTML TABLE ── */
+function buildTable(cols, matrix) {
+  let h = `<table><thead><tr><th></th>`;
+  cols.forEach(c => h += `<th>${c}</th>`);
+  h += `</tr></thead><tbody>`;
+  matrix.forEach((row,i) => {
+    h += `<tr><th style="text-align:left">${cols[i]}</th>`;
+    row.forEach((val,j) => {
+      const rule = getRule(val);
+      const bg  = rule.bg ? `#${rule.bg}` : '';
+      const clr = rule.bg ? `#${rule.fg}` : 'inherit';
+      const bld = i===j ? 'font-weight:bold;' : '';
+      h += `<td style="background:${bg};color:${clr};${bld}" title="${cols[i]} × ${cols[j]}: r=${val.toFixed(4)}">${val.toFixed(2)}</td>`;
+    });
+    h += `</tr>`;
+  });
+  h += `</tbody></table>`;
+  document.getElementById('tableWrap').innerHTML = h;
+}
+
+/* ── PNG EXPORT ── */
+document.getElementById('exportPng').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = document.getElementById('heatmapCanvas').toDataURL('image/png');
+  a.download = 'korelasyon_heatmap.png'; a.click();
+});
+
+/* ── XLSX EXPORT ── */
+document.getElementById('exportXlsx').addEventListener('click', () => {
+  if (!corrMatrix.length) return;
+  if (typeof XLSXStyle !== 'undefined') { buildXlsx(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/xlsx-style@0.8.13/dist/xlsx.full.min.js';
+  s.onload = buildXlsx; s.onerror = fallbackXlsx;
+  document.head.appendChild(s);
+});
+
+function addr(r,c){let s='',x=c;do{s=String.fromCharCode(65+(x%26))+s;x=Math.floor(x/26)-1;}while(x>=0);return s+(r+1);}
+
+function buildXlsx() {
+  const XS = window.XLSXStyle || window.XLSX;
+  const cols = colsUsed, n = cols.length;
+  const wb = { SheetNames:['Korelasyon Matrisi'], Sheets:{} };
+  const ws = {};
+  const HFILL = {patternType:'solid',fgColor:{rgb:'7B2D8B'}};
+  const HFONT = {bold:true,color:{rgb:'FFFFFF'},name:'Arial',sz:10};
+  const CENTER = {horizontal:'center',vertical:'center',wrapText:true};
+  const BORDER = {style:'thin',color:{rgb:'BBBBBB'}};
+  const BORDERS = {top:BORDER,bottom:BORDER,left:BORDER,right:BORDER};
+
+  ws['A1'] = {v:'Korelasyon Matrisi',s:{fill:HFILL,font:{...HFONT,sz:11},alignment:{horizontal:'left',vertical:'center'}}};
+  cols.forEach((c,j) => { ws[addr(0,j+1)] = {v:c,s:{fill:HFILL,font:HFONT,alignment:CENTER}}; });
+  corrMatrix.forEach((row,i) => {
+    ws[addr(i+1,0)] = {v:cols[i],s:{fill:HFILL,font:HFONT,alignment:{horizontal:'left',vertical:'center',wrapText:true}}};
+    row.forEach((val,j) => {
+      const rule = getRule(val);
+      const cell = {v:Math.round(val*100)/100,t:'n',z:'0.00'};
+      cell.s = {alignment:{horizontal:'center',vertical:'center'},border:BORDERS,font:{name:'Arial',sz:10,bold:i===j,color:{rgb:'000000'}}};
+      if (rule.bg) cell.s.fill = {patternType:'solid',fgColor:{rgb:rule.bg}};
+      ws[addr(i+1,j+1)] = cell;
+    });
+  });
+  ws['!cols'] = [{wch:30},...cols.map(()=>({wch:13}))];
+  ws['!rows'] = [{hpt:36},...cols.map(()=>({hpt:28}))];
+  ws['!ref'] = `A1:${addr(n,n)}`;
+  wb.Sheets['Korelasyon Matrisi'] = ws;
+  try {
+    const out = XS.write(wb,{bookType:'xlsx',type:'binary',cellStyles:true});
+    const buf = new ArrayBuffer(out.length);
+    const view = new Uint8Array(buf);
+    for(let i=0;i<out.length;i++) view[i]=out.charCodeAt(i)&0xFF;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([buf],{type:'application/octet-stream'}));
+    a.download='korelasyon_matrisi.xlsx'; a.click();
+  } catch(e) { fallbackXlsx(); }
+}
+
+function fallbackXlsx() {
+  const cols=colsUsed, wb=XLSX.utils.book_new();
+  const aoa=[['Korelasyon Matrisi',...cols]];
+  corrMatrix.forEach((row,i)=>aoa.push([cols[i],...row.map(v=>+(v.toFixed(4)))]));
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=[{wch:28},...cols.map(()=>({wch:12}))];
+  XLSX.utils.book_append_sheet(wb,ws,'Korelasyon Matrisi');
+  XLSX.writeFile(wb,'korelasyon_matrisi.xlsx');
+}
+
+/* ── LOG ── */
+function addLog(msg) {
+  logItems.unshift(msg);
+  const list = document.getElementById('logList');
+  list.innerHTML = logItems.map(m=>`<div class="log-item">${m}</div>`).join('');
+}
+document.getElementById('clearLog').addEventListener('click', () => {
+  logItems = [];
+  document.getElementById('logList').innerHTML='<div class="log-item" style="color:#666;font-style:italic">Geçmiş temizlendi.</div>';
+});
+</script>
 </body>
 </html>
