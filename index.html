@@ -32,10 +32,7 @@ body.light .nav a{color:#333;}
 body.light .nav a.active{background:#e6e9f5;}
 body.light .sidebar-section h4{color:#333;}
 body.light .small-btn{background:#e6e9f5;color:#111;}
-body.light .switch{
-  background:#fff;
-  color:#111;
-}
+body.light .switch{background:#fff;color:#111;}
 
 /* SIDEBAR */
 .sidebar{
@@ -55,10 +52,7 @@ body.light .switch{
   margin-bottom:15px;
 }
 
-.logo img{
-  width:30px;
-  height:30px;
-}
+.logo img{width:30px;height:30px;}
 
 .nav a{
   display:block;
@@ -80,13 +74,8 @@ body.light .switch{
   width:100%;
 }
 
-.section{
-  display:none;
-}
-
-.section.active{
-  display:block;
-}
+.section{display:none;}
+.section.active{display:block;}
 
 .section-title{
   color:#aaa;
@@ -113,9 +102,7 @@ body.light .switch{
   overflow:hidden;
 }
 
-.card.new{
-  animation:pulseGlow 1.6s ease-out 1;
-}
+.card.new{animation:pulseGlow 1.6s ease-out 1;}
 
 @keyframes pulseGlow{
   0%{box-shadow:0 0 0 rgba(255,59,59,0);}
@@ -123,7 +110,6 @@ body.light .switch{
   100%{box-shadow:0 0 0 rgba(255,59,59,0);}
 }
 
-/* NEW ribbon */
 .new-ribbon{
   position:absolute;
   top:12px;
@@ -136,7 +122,6 @@ body.light .switch{
   font-weight:bold;
 }
 
-/* TEST ribbon */
 .test-ribbon{
   position:absolute;
   top:12px;
@@ -149,7 +134,7 @@ body.light .switch{
   font-weight:bold;
 }
 
-/* FAVORITE BUTTON */
+/* FAVORITE */
 .fav-btn{
   margin-top:8px;
   padding:6px 10px;
@@ -159,52 +144,16 @@ body.light .switch{
   cursor:pointer;
   background:#1f1f2d;
   color:#aaa;
-  transition:.2s;
 }
 
-.fav-btn:hover{
-  background:#3a3a55;
-  color:#fff;
-}
+.fav-btn.active{background:gold;color:#111;font-weight:bold;}
 
-.fav-btn.active{
-  background:gold;
-  color:#111;
-  font-weight:bold;
-}
+.card img{width:32px;height:32px;margin-bottom:8px;}
+.card-title{font-size:13px;text-align:center;}
 
-/* POP EFFECT */
-.fav-btn.pop{
-  animation:pop .3s ease;
-}
-
-@keyframes pop{
-  0%{transform:scale(1);}
-  50%{transform:scale(1.3);}
-  100%{transform:scale(1);}
-}
-
-.card img{
-  width:32px;
-  height:32px;
-  margin-bottom:8px;
-}
-
-.card-title{
-  font-size:13px;
-  text-align:center;
-}
-
-/* SIDEBAR LIST */
-.sidebar-section{
-  margin-top:20px;
-}
-
-.sidebar-section h4{
-  font-size:12px;
-  color:#777;
-  margin-bottom:8px;
-}
+/* SIDEBAR */
+.sidebar-section{margin-top:20px;}
+.sidebar-section h4{font-size:12px;color:#777;margin-bottom:8px;}
 
 .sidebar-item{
   display:flex;
@@ -212,14 +161,11 @@ body.light .switch{
   gap:8px;
   font-size:13px;
   margin-bottom:6px;
+  cursor:pointer;
 }
 
-.sidebar-item img{
-  width:18px;
-  height:18px;
-}
+.sidebar-item img{width:18px;height:18px;}
 
-/* BUTTON */
 .small-btn{
   margin-top:8px;
   width:100%;
@@ -238,9 +184,7 @@ body.light .switch{
   top:10px;
 }
 
-/* THEME SWITCH */
 .switch{
-  position:relative;
   display:flex;
   align-items:center;
   gap:10px;
@@ -248,12 +192,9 @@ body.light .switch{
   padding:8px 14px;
   border-radius:30px;
   cursor:pointer;
-  user-select:none;
 }
 
-.switch input{
-  display:none;
-}
+.switch input{display:none;}
 
 .slider{
   width:46px;
@@ -261,7 +202,6 @@ body.light .switch{
   background:#555;
   border-radius:20px;
   position:relative;
-  transition:.3s;
 }
 
 .slider:before{
@@ -273,31 +213,51 @@ body.light .switch{
   border-radius:50%;
   left:3px;
   top:3px;
-  transition:.3s;
 }
 
 .switch input:checked + .slider{
   background:#4caf50;
 }
 
-.switch input:checked + .slider:before{
-  transform:translateX(22px);
+/* 🔴 MAINTENANCE SCREEN */
+#maintenance{
+  position:fixed;
+  inset:0;
+  background:#111;
+  color:#fff;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:999999;
+  text-align:center;
 }
+
+#maintenance h1{
+  color:#ff3b3b;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
+<!-- 🔴 MAINTENANCE SCREEN -->
+<div id="maintenance">
+  <h1>🔧 Sistem Bakımda</h1>
+  <p>Portal geçici olarak kapalıdır</p>
+  <p id="mt">Kontrol...</p>
+</div>
 
+<!-- TOP -->
+<div class="topbar">
 <label class="switch">
   <input type="checkbox" onchange="toggleTheme()">
   <div class="slider"></div>
-  <span id="themeText">🌙 Dark</span>
 </label>
-
 </div>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
 
   <div class="logo">
@@ -309,8 +269,8 @@ body.light .switch{
     <a class="active" onclick="show('all',this)">Dashboard</a>
     <a onclick="show('tp',this)">TP Tools</a>
     <a onclick="show('qa',this)">QA Tools</a>
-    <a onclick="show('reports',this)">Power BI Reports</a>
-    <a onclick="show('office',this)">Microsoft Office</a>
+    <a onclick="show('reports',this)">Reports</a>
+    <a onclick="show('office',this)">Office</a>
   </div>
 
   <div class="sidebar-section">
@@ -326,6 +286,7 @@ body.light .switch{
 
 </div>
 
+<!-- MAIN -->
 <div class="main">
 <h2>Dashboard</h2>
 <div id="app"></div>
@@ -333,222 +294,114 @@ body.light .switch{
 
 <script>
 
+/* 🔴 MAINTENANCE SWITCH */
+const MAINTENANCE_MODE = 0;
+
+if(MAINTENANCE_MODE === 1){
+  document.getElementById("maintenance").style.display="flex";
+
+  let t=10;
+  setInterval(()=>{
+    document.getElementById("mt").innerText="Yeniden kontrol: "+t;
+    t--;
+    if(t<=0) location.reload();
+  },1000);
+}
+
+/* DATA */
 const tools=[
 
-{id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,isTest:0,technical:0,url:"https://sebra.ccms.teleperformance.com/"},
-
-{id:"mytp",name:"MYTP",icon:"mytp.png",cat:"tp",isNew:0,isTest:0,technical:0,url:"https://teleperformance-mytp.sabacloud.com/"},
-
-{id:"random",name:"Randomizer",icon:"logo.png",cat:"qa",isNew:1,isTest:0,technical:0,url:"randomizer.html"},
-
-{id:"corel",name:"Correlation",icon:"logo.png",cat:"qa",isNew:0,isTest:1,technical:0,url:"corel.html"},
-
-{id:"csv",name:"Data CSV Converter",icon:"logo.png",cat:"qa",isNew:1,isTest:0,technical:0,url:"csvconverter.html"},
-
-{id:"sampling",name:"BSH Dağıtım",icon:"logo.png",cat:"qa",isNew:0,isTest:0,technical:0,url:"sampling.html"},
-
-{id:"trceviri",name:"Trendyol CSV Converter",icon:"logo.png",cat:"qa",isNew:1,isTest:0,technical:0,url:"trendyolceviri.html"},
-
-{id:"powerbifb",name:"Feedback Raporu",icon:"powerbi.png",cat:"reports",isNew:0,isTest:0,technical:0,url:"https://app.powerbi.com/"},
-
-{id:"powerbidm",name:"Domestic - Kalite Raporu",icon:"powerbi.png",cat:"reports",isNew:0,isTest:0,technical:0,url:"https://app.powerbi.com/"},
-
-{id:"excel",name:"Excel",icon:"excel.png",cat:"office",isNew:0,isTest:0,technical:0,url:"https://excel.cloud.microsoft/"},
-
-{id:"ppt",name:"PowerPoint",icon:"powerpoint.png",cat:"office",isNew:0,isTest:0,technical:0,url:"https://powerpoint.cloud.microsoft/"},
-
-{id:"word",name:"Word",icon:"word.png",cat:"office",isNew:0,isTest:0,technical:0,url:"https://word.cloud.microsoft/"}
-
+  {id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,isTest:0,url:"https://sebra.ccms.teleperformance.com/"},
+  {id:"mytp",name:"MYTP",icon:"mytp.png",cat:"tp",isNew:0,isTest:0,url:"https://teleperformance-mytp.sabacloud.com/"},
+  {id:"random",name:"Randomizer",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"randomizer.html"},
+  {id:"corel",name:"Correlation",icon:"logo.png",cat:"qa",isNew:0,isTest:1,url:"corel.html"},
+  {id:"csv",name:"Data CSV",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"csvconverter.html"},
+  {id:"sampling",name:"BSH",icon:"logo.png",cat:"qa",isNew:0,isTest:0,url:"sampling.html"},
+  {id:"trceviri",name:"Trendyol",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"trendyolceviri.html"},
+  {id:"powerbifb",name:"Feedback",icon:"powerbi.png",cat:"reports",isNew:0,isTest:0,url:"https://app.powerbi.com/"},
+  {id:"powerbidm",name:"Domestic",icon:"powerbi.png",cat:"reports",isNew:0,isTest:0,url:"https://app.powerbi.com/"},
+  {id:"excel",name:"Excel",icon:"excel.png",cat:"office",isNew:0,isTest:0,url:"https://excel.cloud.microsoft/"},
+  {id:"ppt",name:"PowerPoint",icon:"powerpoint.png",cat:"office",isNew:0,isTest:0,url:"https://powerpoint.cloud.microsoft/"},
+  {id:"word",name:"Word",icon:"word.png",cat:"office",isNew:0,isTest:0,url:"https://word.cloud.microsoft/"}
 ];
 
+/* THEME */
 function toggleTheme(){
-
   document.body.classList.toggle("light");
-
-  themeText.innerText =
-    document.body.classList.contains("light")
-    ? "☀️ Light"
-    : "🌙 Dark";
 }
 
-function render(){
-
-  const app=document.getElementById("app");
-
-  app.innerHTML="";
-
-  ["tp","qa","reports","office"].forEach(cat=>{
-
-    let sec=document.createElement("div");
-
-    sec.className="section active";
-
-    sec.dataset.cat=cat;
-
-    sec.innerHTML=`
-      <div class="section-title">${cat.toUpperCase()}</div>
-
-      <div class="grid">
-        ${tools.filter(t=>t.cat===cat).map(card).join("")}
-      </div>
-    `;
-
-    app.appendChild(sec);
-
-  });
-
-  updateFav();
-  updateRecent();
-}
-
-function card(t){
-
-  let fav=getFav();
-
-  let isFav=fav.includes(t.id);
-
-  return `
-  <div class="card ${t.isNew?'new':''}" onclick="openTool('${t.id}')">
-
-    ${t.isNew?'<div class="new-ribbon">NEW</div>':''}
-
-    ${t.isTest?'<div class="test-ribbon">TEST</div>':''}
-
-    <img src="${t.icon}">
-
-    <div class="card-title">${t.name}</div>
-
-    <button class="fav-btn ${isFav?'active':''}"
-      onclick="event.stopPropagation();toggleFav('${t.id}',this)">
-      ${isFav ? "★ Favoride" : "☆ Favori"}
-    </button>
-
-  </div>`;
-}
-
+/* FAVORITE */
 function getFav(){
   return JSON.parse(localStorage.getItem("fav")||"[]");
 }
 
-function toggleFav(id, btn){
-
-  let fav=getFav();
-
-  const add=!fav.includes(id);
-
-  if(add){
-
-    fav.push(id);
-
-    if(btn){
-
-      btn.classList.add("pop");
-
-      setTimeout(()=>btn.classList.remove("pop"),300);
-    }
-
-  } else {
-
-    fav=fav.filter(x=>x!==id);
-  }
-
-  localStorage.setItem("fav",JSON.stringify(fav));
-
+function toggleFav(id){
+  let f=getFav();
+  f.includes(id)?f=f.filter(x=>x!==id):f.push(id);
+  localStorage.setItem("fav",JSON.stringify(f));
   render();
 }
 
-function clearFav(){
-
-  localStorage.removeItem("fav");
-
-  render();
-}
-
+/* FAVORİ CLICK FIX */
 function updateFav(){
-
   let fav=getFav();
-
   document.getElementById("favList").innerHTML=
     fav.map(id=>{
-
       let t=tools.find(x=>x.id===id);
-
-      return t
-      ? `<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`
-      : "";
-
+      return t?`<div class="sidebar-item" onclick="openTool('${id}')">
+      <img src="${t.icon}">${t.name}</div>`:"";
     }).join("");
 }
 
+/* RECENT */
 function openTool(id){
-
   let t=tools.find(x=>x.id===id);
-
-  if(!t) return;
-
-  let r=JSON.parse(localStorage.getItem("recent") || "[]");
-
-  r=r.filter(x=>x!==id);
-
-  r.unshift(id);
-
-  r=r.slice(0,5);
-
-  localStorage.setItem("recent", JSON.stringify(r));
-
+  let r=JSON.parse(localStorage.getItem("recent")||"[]");
+  r=[id,...r.filter(x=>x!==id)].slice(0,5);
+  localStorage.setItem("recent",JSON.stringify(r));
   updateRecent();
 
-  if(t.technical===1){
-
-    localStorage.setItem("technicalTool", JSON.stringify(t));
-
-    window.location.href="technical.html";
-
-    return;
-  }
-
-  if(t.url.endsWith(".html")){
-
-    window.location.href=t.url;
-
-  } else {
-
-    window.open(t.url, "_blank");
-  }
+  if(t.url.endsWith(".html")) location.href=t.url;
+  else window.open(t.url);
 }
 
 function updateRecent(){
-
   let r=JSON.parse(localStorage.getItem("recent")||"[]");
-
   document.getElementById("recentList").innerHTML=
     r.map(id=>{
-
       let t=tools.find(x=>x.id===id);
-
-      return t
-      ? `<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`
-      : "";
-
+      return t?`<div class="sidebar-item" onclick="openTool('${id}')">
+      <img src="${t.icon}">${t.name}</div>`:"";
     }).join("");
 }
 
-function show(id,el){
-
-  document.querySelectorAll(".nav a")
-    .forEach(a=>a.classList.remove("active"));
-
-  el.classList.add("active");
-
-  document.querySelectorAll(".section").forEach(s=>{
-
-    s.style.display =
-      (id==="all" || s.dataset.cat===id)
-      ? "block"
-      : "none";
+/* RENDER */
+function render(){
+  const app=document.getElementById("app");
+  app.innerHTML="";
+  ["tp","qa","reports","office"].forEach(cat=>{
+    let sec=document.createElement("div");
+    sec.className="section active";
+    sec.innerHTML=`
+      <div class="section-title">${cat.toUpperCase()}</div>
+      <div class="grid">
+        ${tools.filter(t=>t.cat===cat).map(t=>`
+        <div class="card" onclick="openTool('${t.id}')">
+          <img src="${t.icon}">
+          <div class="card-title">${t.name}</div>
+          <button class="fav-btn ${getFav().includes(t.id)?'active':''}"
+          onclick="event.stopPropagation();toggleFav('${t.id}')">★</button>
+        </div>`).join("")}
+      </div>`;
+    app.appendChild(sec);
   });
+  updateFav();
+  updateRecent();
 }
 
+function show(){}
+
+/* INIT */
 render();
 
 </script>
