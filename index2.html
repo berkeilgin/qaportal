@@ -15,21 +15,11 @@ body{
   transition:.3s;
 }
 
-/* LIGHT MODE */
 body.light{
   background:#f4f6fb;
   color:#111;
 }
 
-body.light .sidebar{background:#fff;}
-body.light .card{background:#fff;color:#111;}
-body.light .section-title{color:#333;}
-body.light .nav a{color:#333;}
-body.light .nav a.active{background:#e6e9f5;}
-body.light .sidebar-section h4{color:#333;}
-body.light .small-btn{background:#e6e9f5;color:#111;}
-
-/* SIDEBAR */
 .sidebar{
   width:220px;
   background:#151521;
@@ -47,11 +37,9 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
   padding:10px;
   color:#aaa;
   cursor:pointer;
-  border-radius:8px;
 }
 .nav a.active{background:#2c2c3e;color:#fff;}
 
-/* MAIN */
 .main{
   margin-left:220px;
   padding:30px;
@@ -59,111 +47,71 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
 }
 
 .section{display:none;}
-.section.active{display:block;}
-
-.section-title{color:#aaa;margin:10px 0;}
+.section-title{margin:10px 0;}
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:15px;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:10px;
 }
 
-/* CARD */
 .card{
   background:#2c2c3e;
-  height:150px;
-  border-radius:14px;
+  height:140px;
   display:flex;
-  flex-direction:column;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
+  flex-direction:column;
   position:relative;
   cursor:pointer;
-  overflow:hidden;
 }
 
-.card.new{
-  animation:pulseGlow 1.6s ease-out 1;
-}
+.card img{width:30px;}
 
-@keyframes pulseGlow{
-  0%{box-shadow:0 0 0 rgba(255,59,59,0);}
-  50%{box-shadow:0 0 18px rgba(255,59,59,0.55);}
-  100%{box-shadow:0 0 0 rgba(255,59,59,0);}
-}
-
-/* NEW ribbon */
 .new-ribbon{
   position:absolute;
-  top:12px;
-  right:-32px;
-  background:#ff3b3b;
-  color:#fff;
-  font-size:10px;
-  padding:4px 38px;
+  top:10px;
+  right:-30px;
+  background:red;
   transform:rotate(45deg);
-  font-weight:bold;
+  padding:3px 25px;
+  font-size:10px;
 }
 
-/* ✅ TEST ribbon */
 .test-ribbon{
   position:absolute;
-  top:36px;
-  right:-32px;
+  top:35px;
+  right:-30px;
   background:gold;
-  color:#111;
-  font-size:10px;
-  padding:4px 38px;
   transform:rotate(45deg);
-  font-weight:bold;
-}
-
-/* SWITCH */
-.switch{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:6px 10px;
-  border-radius:20px;
-  font-size:12px;
-  cursor:pointer;
-}
-
-.switch input{display:none;}
-
-.slider{
-  width:40px;
-  height:20px;
-  background:#444;
-  border-radius:20px;
-  position:relative;
-}
-
-.slider::before{
-  content:"";
-  width:16px;
-  height:16px;
-  background:#fff;
-  position:absolute;
-  top:2px;
-  left:2px;
-  border-radius:50%;
-  transition:.3s;
-}
-
-.switch input:checked + .slider{
-  background:#4cafef;
-}
-
-.switch input:checked + .slider::before{
-  transform:translateX(20px);
+  padding:3px 25px;
+  font-size:10px;
 }
 
 .topbar{
   position:fixed;
   right:10px;
   top:10px;
+}
+
+.switch{display:flex;gap:8px;cursor:pointer;}
+.slider{
+  width:40px;height:20px;
+  background:#444;
+  border-radius:20px;
+  position:relative;
+}
+.slider:before{
+  content:"";
+  width:16px;height:16px;
+  background:#fff;
+  position:absolute;
+  top:2px;left:2px;
+  border-radius:50%;
+  transition:.3s;
+}
+.switch input:checked + .slider:before{
+  transform:translateX(20px);
 }
 </style>
 </head>
@@ -188,8 +136,8 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
     <a class="active" onclick="show('all',this)">Dashboard</a>
     <a onclick="show('tp',this)">TP Tools</a>
     <a onclick="show('qa',this)">QA Tools</a>
-    <a onclick="show('reports',this)">Power BI Reports</a>
-    <a onclick="show('office',this)">Microsoft Office</a>
+    <a onclick="show('reports',this)">Reports</a>
+    <a onclick="show('office',this)">Office</a>
   </div>
 </div>
 
@@ -200,38 +148,22 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
 
 <script>
 
-/* DATA (isTest eklendi) */
 const tools=[
-  {id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,isTest:0,url:"https://sebra.ccms.teleperformance.com/"},
-  {id:"mytp",name:"MYTP",icon:"mytp.png",cat:"tp",isNew:0,isTest:0,url:"https://teleperformance-mytp.sabacloud.com/"},
-
-  {id:"csv",name:"CSV Converter",icon:"logo.png",cat:"qa",isNew:1,isTest:1,url:"csvconverter.html"},
-  {id:"random",name:"Randomizer",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"randomizer.html"},
-  {id:"corel",name:"Correlation",icon:"logo.png",cat:"qa",isNew:1,isTest:1,url:"corel.html"},
-  {id:"sampling",name:"Sampling Tool",icon:"logo.png",cat:"qa",isNew:0,isTest:0,url:"sampling.html"},
-
-  {id:"powerbifb",name:"Feedback Raporu",icon:"powerbi.png",cat:"reports",isNew:0,isTest:0,url:"https://app.powerbi.com/"},
-  {id:"powerbidm",name:"Domestic - Kalite Raporu",icon:"powerbi.png",cat:"reports",isNew:0,isTest:0,url:"https://app.powerbi.com/"},
-
-  {id:"excel",name:"Excel",icon:"excel.png",cat:"office",isNew:0,isTest:0,url:"https://excel.cloud.microsoft/"},
-  {id:"ppt",name:"PowerPoint",icon:"powerpoint.png",cat:"office",isNew:0,isTest:0,url:"https://powerpoint.cloud.microsoft/"},
-  {id:"word",name:"Word",icon:"word.png",cat:"office",isNew:0,isTest:0,url:"https://word.cloud.microsoft/"}
+  {id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,isTest:0,url:"#"},
+  {id:"csv",name:"CSV",icon:"logo.png",cat:"qa",isNew:1,isTest:1,url:"csvconverter.html"}
 ];
 
-/* THEME FIX */
 function toggleTheme(){
   document.body.classList.toggle("light");
   document.getElementById("themeText").innerText =
     document.body.classList.contains("light") ? "☀️ Light" : "🌙 Dark";
 }
 
-/* RENDER FIX (en kritik) */
 function render(){
   const app=document.getElementById("app");
   app.innerHTML="";
 
-  ["tp","qa","reports","office"].forEach(cat=>{
-
+  ["tp","qa"].forEach(cat=>{
     let sec=document.createElement("div");
     sec.className="section";
     sec.dataset.cat=cat;
@@ -239,7 +171,7 @@ function render(){
     sec.innerHTML=`
       <div class="section-title">${cat.toUpperCase()}</div>
       <div class="grid">
-        ${tools.filter(t=>t.cat===cat).map(t=>card(t)).join("")}
+        ${tools.filter(t => t.cat === cat).map(t => card(t)).join("")}
       </div>
     `;
 
@@ -247,24 +179,17 @@ function render(){
   });
 }
 
-/* CARD */
 function card(t){
-
   return `
-  <div class="card ${t.isNew?'new':''}" onclick="openTool('${t.id}')">
-
-    ${t.isNew?'<div class="new-ribbon">NEW</div>':''}
-    ${t.isTest?'<div class="test-ribbon">TEST</div>':''}
-
-    <img src="${="card-title">${t.name}</div>
-
+  <div class="card" onclick="openTool('${t.id}')">
+    ${t.isNew ? '<div class="new-ribbon">NEW</div>' : ''}
+    ${t.isTest ? '<div class="test-ribbon">TEST</div>' : ''}
+    <img src="${tme}</div>
   </div>`;
 }
 
-/* OPEN */
 function openTool(id){
   let t=tools.find(x=>x.id===id);
-
   if(t.url.endsWith(".html")){
     location.href=t.url;
   }else{
@@ -272,17 +197,15 @@ function openTool(id){
   }
 }
 
-/* NAV */
-function show(id,el){
+function show(cat,el){
   document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
   el.classList.add("active");
 
   document.querySelectorAll(".section").forEach(s=>{
-    s.style.display = (id==="all" || s.dataset.cat===id) ? "block" : "none";
+    s.style.display=(cat==="all"||s.dataset.cat===cat)?"block":"none";
   });
 }
 
-/* INIT */
 render();
 show("all", document.querySelector(".nav a"));
 
