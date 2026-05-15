@@ -227,6 +227,14 @@ function excelDateToJSDate(serial){
   return date_info;
 }
 
+  // ✅ Fazladan +3 kaldırıldı
+  date_info.setHours(hours);
+  date_info.setMinutes(minutes);
+  date_info.setSeconds(seconds);
+
+  return date_info;
+}
+
 // UNIVERSAL DATE FIX
 function parseDate(val){
 
