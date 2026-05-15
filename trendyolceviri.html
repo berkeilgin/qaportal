@@ -89,12 +89,27 @@ var detayLoaded = false;
 
 // ✅ SERIAL DATE → JS DATE
 function excelDateToJSDate(serial) {
-  // UTC olarak üret, local timezone çarpıtmasın
-  const utc = new Date(Date.UTC(0, 0, serial - 25569));
 
-  const ms = (serial - Math.floor(serial)) * 86400000;
+  const utc_days = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400;
 
-  return new Date(utc.getTime() + ms);
+  const date_info = new Date(utc_value * 1000);
+
+  const fractional_day = serial - Math.floor(serial);
+
+  let total_seconds = Math.round(86400 * fractional_day);
+
+  const seconds = total_seconds % 60;
+  total_seconds -= seconds;
+
+  const hours = Math.floor(total_seconds / 3600);
+  const minutes = Math.floor(total_seconds / 60) % 60;
+
+  date_info.setUTCHours(hours);
+  date_info.setUTCMinutes(minutes);
+  date_info.setUTCSeconds(seconds);
+
+  return date_info;
 }
 
 // ✅ UNIVERSAL DATE FIX
@@ -120,7 +135,6 @@ function parseDate(val){
 
 function formatDateTR(d){
 
-  // TR timezone sabitle (en kritik fix)
   const tr = new Date(d.toLocaleString("en-US", {
     timeZone: "Europe/Istanbul"
   }));
