@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Trendyol CSV Tool</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:#1e1e2f;
+  color:white;
+}
+
+.header {
+  padding:15px;
+  background:#2c2c3e;
+}
+
+.container {
+  max-width:700px;
+  margin:40px auto;
+  padding:30px;
+  background:#2c2c3e;
+  border-radius:12px;
+  text-align:center;
+}
+
+.btn {
+  padding:12px 20px;
+  background:#4CAF50;
+  border:none;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  margin:10px;
+}
+
+.loader {
+  display:none;
+  margin-top:10px;
+  padding:8px;
+  background:#333;
+  border-radius:8px;
+  animation:pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {opacity:0.5}
+  50% {opacity:1}
+  100% {opacity:0.5}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">📊 Trendyol CSV Tool</div>
+
+<div class="container">
+
+  <h3>📁 Özet Data</h3>
+  <input type="file" id="file1" multiple>
+  <div id="loader1" class="loader">⏳ Özet yükleniyor...</div>
+
+  <h3>📁 Detay Data</h3>
+  <input type="file" id="file2" multiple>
+  <div id="loader2" class="loader">⏳ Detay yükleniyor...</div>
+
+  <br>
+
+  <button class="btn" onclick="exportAll()">💾 Excel İndir</button>
+  <button class="btn" onclick="resetAll()">🧹 Temizle</button>
+
+  <div id="status">Bekleniyor...</div>
+
+  <div id="exportLoader" class="loader">⏳ Excel hazırlanıyor...</div>
+
+</div>
+
+<script>
+
+var data1 = [];
+var data2 = [];
+var detayLoaded = false;
+
+// ✅ SERIAL DATE → JS DATE
+function excelDateToJSDate(serial) {
+  return new Date((serial - 25569) * 86400 * 1000);
+}
+
+// ✅ UNIVERSAL DATE FIX
+function parseDate(val){
+
+  if(!val) return "";
+
+  // ✅ Excel number
+  if(!isNaN(val)){
+    let d = excelDateToJSDate(Number(val));
+    return formatDateTR(d);
+  }
+
+  // ✅ String parse
+  let d = new Date(val);
+
+  if(!isNaN(d)){
+    return formatDateTR(d);
+  }
+
+  return val;
+}
+
+function formatDateTR(d){
+  let day = String(d.getDate()).padStart(2,'0');
+  let month = String(d.getMonth()+1).padStart(2,'0');
+  let year = d.getFullYear();
+
+  let h = String(d.getHours()).padStart(2,'0');
+  let m = String(d.getMinutes()).padStart(2,'0');
+
+  return `${day}.${month}.${year} ${h}:${m}`;
+}
+
+// ✅ NUMBER SAFE
+function toNumber(val){
+  return Number(String(val).replace(",", ".")) || 0;
+}
+
+// ✅ STATUS
+function updateStatus(){
+  document.getElementById("status").innerText =
+    `Özet: ${data1.length} | Detay: ${data2.length}`;
+}
+
+// ================= QUERY1 =================
+file1.addEventListener('change', async (e)=>{
+
+  document.getElementById("loader1").style.display = "block";
+
+  data1 = [];
+  const files = Array.from(e.target.files);
+
+  for(const f of files){
+
+    const buffer = await f.arrayBuffer();
+    const wb = XLSX.read(buffer);
+
+    let rows = XLSX.utils.sheet_to_json(
+      wb.Sheets[wb.SheetNames[0]], { defval:"" }
+    );
+
+    rows = rows
+      .filter(r=> r["Iptal"]==="Hayır")
+      .map(r=>{
+
+        let obj = {};
+
+        for(let k in r){
+          let val = r[k];
+
+          if(k.includes("Tarih")){
+            val = parseDate(val); // ✅ FIX
+          }
+
+          obj[k] = val;
+        }
+
+        obj.Puan = toNumber(obj.Puan);
+
+        return obj;
+      });
+
+    data1 = data1.concat(rows);
+  }
+
+  document.getElementById("loader1").style.display = "none";
+
+  updateStatus();
+});
+
+// ================= QUERY2 =================
+file2.addEventListener('change', async (e)=>{
+
+  document.getElementById("loader2").style.display = "block";
+
+  data2 = [];
+  detayLoaded = false;
+
+  const files = Array.from(e.target.files);
+
+  for(const f of files){
+
+    const buffer = await f.arrayBuffer();
+    const wb = XLSX.read(buffer);
+
+    let rows = XLSX.utils.sheet_to_json(
+      wb.Sheets[wb.SheetNames[0]], { defval:"" }
+    );
+
+    rows = rows
+      .map(r=>{
+
+        let obj = {};
+
+for(let k in r){
+
+  let val = r[k];
+
+  // ✅ CEVAP + SORU KOLONU TEMİZLİK
+  if(k === "Cevap" || k === "Soru"){
+    val = String(val || "")
+      .replace(/\s+/g, " ")       // fazla boşlukları teke indir
+      .replace(/^\s+|\s+$/g, ""); // baş/son trim
+  }
+
+  // ✅ TARİH
+  if(k.includes("Tarih")){
+    val = parseDate(val);
+  }
+
+  obj[k] = val;
+}
+
+
+        obj.Puan = toNumber(obj.Puan);
+        obj.Sure = toNumber(obj.Sure);
+
+        return obj;
+      })
+      .filter(r=> r["Iptal"]==="Hayır");
+
+    data2 = data2.concat(rows);
+  }
+
+  detayLoaded = true;
+
+  document.getElementById("loader2").style.display = "none";
+
+  updateStatus();
+});
+
+// ================= EXPORT =================
+function exportAll(){
+
+  if(!data1.length){
+    alert("Özet data yok");
+    return;
+  }
+
+  if(!detayLoaded){
+    alert("Detay yüklenmeden export olmaz");
+    return;
+  }
+
+  document.getElementById("exportLoader").style.display = "block";
+
+  setTimeout(()=>{
+
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(data1),
+      "Özet Data"
+    );
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(data2),
+      "Detay Data"
+    );
+
+    let d = new Date();
+    let fileName = `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}_TrendyolMPData.xlsx`;
+
+    XLSX.writeFile(wb, fileName);
+
+    document.getElementById("exportLoader").style.display = "none";
+
+  },150);
+}
+
+// ================= RESET =================
+function resetAll(){
+  data1 = [];
+  data2 = [];
+  detayLoaded = false;
+
+  file1.value = "";
+  file2.value = "";
+
+  updateStatus();
+}
+
+</script>
+
+</body>
+</html>
