@@ -89,11 +89,9 @@ var detayLoaded = false;
 
 // ✅ SERIAL DATE → JS DATE
 function excelDateToJSDate(serial) {
-
-  const utc_ms = Math.round((serial - 25569) * 86400 * 1000);
-
-  // ⚠️ IMPORTANT: UTC date üret
-  return new Date(Date.UTC(1970, 0, 1) + utc_ms);
+  // ❗ round KULLANMA (drift yapıyor)
+  const utc_ms = (serial - 25569) * 86400 * 1000;
+  return new Date(utc_ms);
 }
 
 // ✅ UNIVERSAL DATE FIX
@@ -101,15 +99,19 @@ function parseDate(val){
 
   if(!val) return "";
 
-  // ✅ Excel number
-  if(!isNaN(val)){
-    let d = excelDateToJSDate(Number(val));
+  // ✅ Excel serial number
+  if(typeof val === "number"){
+    const d = excelDateToJSDate(val);
     return formatDateTR(d);
   }
 
-  // ✅ String parse
-  let d = new Date(val);
+  // ✅ Excel bazen direkt Date object verir
+  if(val instanceof Date){
+    return formatDateTR(val);
+  }
 
+  // string fallback
+  const d = new Date(val);
   if(!isNaN(d)){
     return formatDateTR(d);
   }
