@@ -91,14 +91,17 @@ var detayLoaded = false;
 
 function excelDateToJSDate(serial) {
 
-  const excelEpoch = new Date(1899, 11, 30);
-
   const days = Math.floor(serial);
   const fraction = serial - days;
 
-  const ms = Math.round(fraction * 86400 * 1000);
+  const date = new Date(1899, 11, 30);
 
-  return new Date(excelEpoch.getTime() + days * 86400 * 1000 + ms);
+  date.setDate(date.getDate() + days);
+
+  const seconds = Math.round(fraction * 86400);
+  date.setSeconds(date.getSeconds() + seconds);
+
+  return date;
 }
 
 
@@ -136,7 +139,7 @@ function formatDateTR(d){
 
   const get = (t) => tr.find(x => x.type === t)?.value;
 
-return "'" + `${get("day")}.${get("month")}.${get("year")} ${get("hour")}:${get("minute")}`;
+return `${get("day")}.${get("month")}.${get("year")} ${get("hour")}:${get("minute")}`;
 }
   
 // ✅ NUMBER SAFE
