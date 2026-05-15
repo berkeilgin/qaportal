@@ -89,7 +89,11 @@ var detayLoaded = false;
 
 // ✅ SERIAL DATE → JS DATE
 function excelDateToJSDate(serial) {
-  return new Date((serial - 25569) * 86400000);
+
+  const utc_ms = Math.round((serial - 25569) * 86400 * 1000);
+
+  // ⚠️ IMPORTANT: UTC date üret
+  return new Date(Date.UTC(1970, 0, 1) + utc_ms);
 }
 
 // ✅ UNIVERSAL DATE FIX
@@ -115,17 +119,21 @@ function parseDate(val){
 
 function formatDateTR(d){
 
-  return new Intl.DateTimeFormat("tr-TR", {
+  const tr = new Intl.DateTimeFormat("tr-TR", {
     timeZone: "Europe/Istanbul",
-    year: "numeric",
+    year: "2-digit",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false
-  }).format(d);
-}
+  }).formatToParts(d);
 
+  const get = (t) => tr.find(x => x.type === t)?.value;
+
+  return `${get("day")}.${get("month")}.${get("year")} ${get("hour")}:${get("minute")}`;
+}
+  
 // ✅ NUMBER SAFE
 function toNumber(val){
   return Number(String(val).replace(",", ".")) || 0;
