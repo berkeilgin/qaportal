@@ -2,10 +2,14 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>QA Portal2</title>
+<title>QA Portal</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
 body{
   font-family:Segoe UI,Arial;
@@ -28,6 +32,10 @@ body.light .nav a{color:#333;}
 body.light .nav a.active{background:#e6e9f5;}
 body.light .sidebar-section h4{color:#333;}
 body.light .small-btn{background:#e6e9f5;color:#111;}
+body.light .switch{
+  background:#fff;
+  color:#111;
+}
 
 /* SIDEBAR */
 .sidebar{
@@ -35,12 +43,22 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
   background:#151521;
   min-height:100vh;
   position:fixed;
-  left:0;top:0;
+  left:0;
+  top:0;
   padding:20px;
 }
 
-.logo{display:flex;gap:10px;align-items:center;margin-bottom:15px;}
-.logo img{width:30px;height:30px;}
+.logo{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.logo img{
+  width:30px;
+  height:30px;
+}
 
 .nav a{
   display:block;
@@ -49,7 +67,11 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
   cursor:pointer;
   border-radius:8px;
 }
-.nav a.active{background:#2c2c3e;color:#fff;}
+
+.nav a.active{
+  background:#2c2c3e;
+  color:#fff;
+}
 
 /* MAIN */
 .main{
@@ -58,10 +80,18 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
   width:100%;
 }
 
-.section{display:none;}
-.section.active{display:block;}
+.section{
+  display:none;
+}
 
-.section-title{color:#aaa;margin:10px 0;}
+.section.active{
+  display:block;
+}
+
+.section-title{
+  color:#aaa;
+  margin:10px 0;
+}
 
 .grid{
   display:grid;
@@ -106,6 +136,19 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
   font-weight:bold;
 }
 
+/* TEST ribbon */
+.test-ribbon{
+  position:absolute;
+  top:12px;
+  left:-32px;
+  background:#ffd500;
+  color:#111;
+  font-size:10px;
+  padding:4px 38px;
+  transform:rotate(-45deg);
+  font-weight:bold;
+}
+
 /* FAVORITE BUTTON */
 .fav-btn{
   margin-top:8px;
@@ -142,7 +185,8 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
 }
 
 .card img{
-  width:32px;height:32px;
+  width:32px;
+  height:32px;
   margin-bottom:8px;
 }
 
@@ -152,8 +196,15 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
 }
 
 /* SIDEBAR LIST */
-.sidebar-section{margin-top:20px;}
-.sidebar-section h4{font-size:12px;color:#777;margin-bottom:8px;}
+.sidebar-section{
+  margin-top:20px;
+}
+
+.sidebar-section h4{
+  font-size:12px;
+  color:#777;
+  margin-bottom:8px;
+}
 
 .sidebar-item{
   display:flex;
@@ -162,7 +213,11 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
   font-size:13px;
   margin-bottom:6px;
 }
-.sidebar-item img{width:18px;height:18px;}
+
+.sidebar-item img{
+  width:18px;
+  height:18px;
+}
 
 /* BUTTON */
 .small-btn{
@@ -176,21 +231,57 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
   color:#fff;
 }
 
-/* TOP */
+/* TOPBAR */
 .topbar{
   position:fixed;
   right:10px;
   top:10px;
 }
 
+/* THEME SWITCH */
 .switch{
+  position:relative;
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:10px;
   background:#2c2c3e;
-  padding:6px 10px;
+  padding:8px 14px;
+  border-radius:30px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.switch input{
+  display:none;
+}
+
+.slider{
+  width:46px;
+  height:24px;
+  background:#555;
   border-radius:20px;
-  font-size:12px;
+  position:relative;
+  transition:.3s;
+}
+
+.slider:before{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:#fff;
+  border-radius:50%;
+  left:3px;
+  top:3px;
+  transition:.3s;
+}
+
+.switch input:checked + .slider{
+  background:#4caf50;
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(22px);
 }
 </style>
 </head>
@@ -199,10 +290,13 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
 
 <!-- TOP -->
 <div class="topbar">
-  <label class="switch">
-    <input type="checkbox" onchange="toggleTheme()">
-    <span id="themeText">🌙 Dark</span>
-  </label>
+
+<label class="switch">
+  <input type="checkbox" onchange="toggleTheme()">
+  <div class="slider"></div>
+  <span id="themeText">🌙 Dark</span>
+</label>
+
 </div>
 
 <!-- SIDEBAR -->
@@ -244,49 +338,106 @@ body.light .small-btn{background:#e6e9f5;color:#111;}
 
 /* DATA */
 const tools=[
-  {id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,url:"https://sebra.ccms.teleperformance.com/"},
-  {id:"mytp",name:"MYTP",icon:"mytp.png",cat:"tp",isNew:0,url:"https://teleperformance-mytp.sabacloud.com/"},
 
-  {id:"csv",name:"CSV Converter",icon:"logo.png",cat:"qa",isNew:1,url:"csvconverter.html"},
-  {id:"random",name:"Randomizer",icon:"logo.png",cat:"qa",isNew:1,url:"randomizer.html"},
-  {id:"corel",name:"Correlation",icon:"logo.png",cat:"qa",isNew:1,url:"corel.html"},
-  {id:"sampling",name:"Sampling Tool",icon:"logo.png",cat:"qa",isNew:0,url:"sampling.html"},
+  {id:"bms",name:"TP BMS",icon:"tp_bms.png",cat:"tp",isNew:0,isTest:0,url:"https://sebra.ccms.teleperformance.com/"},
 
+  {id:"mytp",name:"MYTP",icon:"mytp.png",cat:"tp",isNew:0,isTest:0,url:"https://teleperformance-mytp.sabacloud.com/"},
 
-{id:"powerbifb",name:"Feedback Raporu",icon:"powerbi.png",cat:"reports",isNew:0,url:"https://app.powerbi.com/groups/me/reports/b2a84882-c506-426d-a56d-70dcf410f200/ReportSection6e0f125c1a8e11c66787?experience=power-bi"},
-  {id:"powerbidm",name:"Domestic - Kalite Raporu",icon:"powerbi.png",cat:"reports",isNew:0,url:"https://app.powerbi.com/groups/me/reports/b2a84882-c506-426d-a56d-70dcf410f200/ReportSection6e0f125c1a8e11c66787?experience=power-bi"},
+  {id:"random",name:"Randomizer",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"randomizer.html"},
 
-  {id:"excel",name:"Excel",icon:"excel.png",cat:"office",isNew:0,url:"https://excel.cloud.microsoft/"},
-  {id:"ppt",name:"PowerPoint",icon:"powerpoint.png",cat:"office",isNew:0,url:"https://powerpoint.cloud.microsoft/"},
-  {id:"word",name:"Word",icon:"word.png",cat:"office",isNew:0,url:"https://word.cloud.microsoft/"}
+  {id:"corel",name:"Correlation",icon:"logo.png",cat:"qa",isNew:0,isTest:1,url:"corel.html"},
+  {id:"csv",name:"Data CSV Converter",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"csvconverter.html"},
+  {id:"sampling",name:"BSH Dağıtım",icon:"logo.png",cat:"qa",isNew:0,isTest:0,url:"sampling.html"},
+  {id:"trceviri",name:"Trendyol CSV Converter",icon:"logo.png",cat:"qa",isNew:1,isTest:0,url:"trendyolceviri.html"},
+
+  {
+    id:"powerbifb",
+    name:"Feedback Raporu",
+    icon:"powerbi.png",
+    cat:"reports",
+    isNew:0,
+    isTest:0,
+    url:"https://app.powerbi.com/"
+  },
+
+  {
+    id:"powerbidm",
+    name:"Domestic - Kalite Raporu",
+    icon:"powerbi.png",
+    cat:"reports",
+    isNew:0,
+    isTest:0,
+    url:"https://app.powerbi.com/"
+  },
+
+  {
+    id:"excel",
+    name:"Excel",
+    icon:"excel.png",
+    cat:"office",
+    isNew:0,
+    isTest:0,
+    url:"https://excel.cloud.microsoft/"
+  },
+
+  {
+    id:"ppt",
+    name:"PowerPoint",
+    icon:"powerpoint.png",
+    cat:"office",
+    isNew:0,
+    isTest:0,
+    url:"https://powerpoint.cloud.microsoft/"
+  },
+
+  {
+    id:"word",
+    name:"Word",
+    icon:"word.png",
+    cat:"office",
+    isNew:0,
+    isTest:0,
+    url:"https://word.cloud.microsoft/"
+  }
+
 ];
 
 /* THEME */
 function toggleTheme(){
+
   document.body.classList.toggle("light");
-  document.getElementById("themeText").innerText =
-    document.body.classList.contains("light") ? "☀️ Light" : "🌙 Dark";
+
+  themeText.innerText =
+    document.body.classList.contains("light")
+    ? "☀️ Light"
+    : "🌙 Dark";
 }
 
 /* RENDER */
 function render(){
+
   const app=document.getElementById("app");
+
   app.innerHTML="";
 
   ["tp","qa","reports","office"].forEach(cat=>{
 
     let sec=document.createElement("div");
+
     sec.className="section active";
+
     sec.dataset.cat=cat;
 
     sec.innerHTML=`
       <div class="section-title">${cat.toUpperCase()}</div>
+
       <div class="grid">
         ${tools.filter(t=>t.cat===cat).map(card).join("")}
       </div>
     `;
 
     app.appendChild(sec);
+
   });
 
   updateFav();
@@ -297,6 +448,7 @@ function render(){
 function card(t){
 
   let fav=getFav();
+
   let isFav=fav.includes(t.id);
 
   return `
@@ -304,7 +456,10 @@ function card(t){
 
     ${t.isNew?'<div class="new-ribbon">NEW</div>':''}
 
+    ${t.isTest?'<div class="test-ribbon">TEST</div>':''}
+
     <img src="${t.icon}">
+
     <div class="card-title">${t.name}</div>
 
     <button class="fav-btn ${isFav?'active':''}"
@@ -327,76 +482,108 @@ function toggleFav(id, btn){
   const add=!fav.includes(id);
 
   if(add){
+
     fav.push(id);
 
     if(btn){
+
       btn.classList.add("pop");
+
       setTimeout(()=>btn.classList.remove("pop"),300);
     }
 
   } else {
+
     fav=fav.filter(x=>x!==id);
   }
 
   localStorage.setItem("fav",JSON.stringify(fav));
+
   render();
 }
 
 function clearFav(){
+
   localStorage.removeItem("fav");
+
   render();
 }
 
 function updateFav(){
+
   let fav=getFav();
 
   document.getElementById("favList").innerHTML=
     fav.map(id=>{
+
       let t=tools.find(x=>x.id===id);
-      return t?`<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`:"";
+
+      return t
+      ? `<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`
+      : "";
+
     }).join("");
 }
 
 /* RECENT */
 function openTool(id){
 
-  let t = tools.find(x => x.id === id);
+  let t=tools.find(x=>x.id===id);
+
   if(!t) return;
 
-  let r = JSON.parse(localStorage.getItem("recent") || "[]");
-  r = r.filter(x => x !== id);
+  let r=JSON.parse(localStorage.getItem("recent") || "[]");
+
+  r=r.filter(x=>x!==id);
+
   r.unshift(id);
-  r = r.slice(0,5);
+
+  r=r.slice(0,5);
 
   localStorage.setItem("recent", JSON.stringify(r));
+
   updateRecent();
 
-  // ✅ HTML ise aynı sekme, değilse yeni sekme
   if(t.url.endsWith(".html")){
-    window.location.href = t.url;
+
+    window.location.href=t.url;
+
   } else {
+
     window.open(t.url, "_blank");
   }
 }
 
 function updateRecent(){
+
   let r=JSON.parse(localStorage.getItem("recent")||"[]");
 
   document.getElementById("recentList").innerHTML=
     r.map(id=>{
+
       let t=tools.find(x=>x.id===id);
-      return t?`<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`:"";
+
+      return t
+      ? `<div class="sidebar-item"><img src="${t.icon}">${t.name}</div>`
+      : "";
+
     }).join("");
 }
 
 /* NAV */
 function show(id,el){
 
-  document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
+  document.querySelectorAll(".nav a")
+    .forEach(a=>a.classList.remove("active"));
+
   el.classList.add("active");
 
   document.querySelectorAll(".section").forEach(s=>{
-    s.style.display = (id==="all" || s.dataset.cat===id) ? "block" : "none";
+
+    s.style.display =
+      (id==="all" || s.dataset.cat===id)
+      ? "block"
+      : "none";
   });
 }
 
