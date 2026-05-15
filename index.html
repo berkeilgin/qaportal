@@ -360,20 +360,23 @@ function updateFav(){
 /* RECENT */
 function openTool(id){
 
-  let t=tools.find(x=>x.id===id);
+  let t = tools.find(x => x.id === id);
   if(!t) return;
 
-  let r=JSON.parse(localStorage.getItem("recent")||"[]");
-  r=r.filter(x=>x!==id);
+  let r = JSON.parse(localStorage.getItem("recent") || "[]");
+  r = r.filter(x => x !== id);
   r.unshift(id);
-  r=r.slice(0,5);
+  r = r.slice(0,5);
 
-  localStorage.setItem("recent",JSON.stringify(r));
-
+  localStorage.setItem("recent", JSON.stringify(r));
   updateRecent();
 
-  const w=window.open(t.url,"_blank");
-  if(!w) location.href=t.url;
+  // ✅ HTML ise aynı sekme, değilse yeni sekme
+  if(t.url.endsWith(".html")){
+    window.location.href = t.url;
+  } else {
+    window.open(t.url, "_blank");
+  }
 }
 
 function updateRecent(){
