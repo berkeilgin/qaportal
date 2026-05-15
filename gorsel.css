@@ -1,0 +1,300 @@
+body {
+  margin:0;
+  font-family:Arial;
+  background:#1e1e2f;
+  color:white;
+  transition:.3s;
+}
+
+/* ✅ LIGHT MODE */
+body.light {
+  background:#f5f5f5;
+  color:#222;
+}
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  background:#2c2c3e;
+}
+
+body.light .header {
+  background:#ddd;
+}
+
+.right {
+  display:flex;
+  gap:15px;
+  align-items:center;
+}
+
+.run-btn {
+  background:#4CAF50;
+  color:white;
+  padding:10px 20px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* SWITCH */
+.switch {
+  display:flex;
+  gap:6px;
+  font-size:12px;
+}
+
+.switch input { display:none; }
+
+.slider {
+  width:40px;
+  height:20px;
+  background:#666;
+  border-radius:20px;
+  position:relative;
+}
+
+.slider:before {
+  content:"";
+  width:16px;
+  height:16px;
+  background:white;
+  position:absolute;
+  top:2px;
+  left:2px;
+  border-radius:50%;
+  transition:.3s;
+}
+
+input:checked + .slider {
+  background:#4CAF50;
+}
+
+input:checked + .slider:before {
+  transform:translateX(20px);
+}
+
+.container {
+  max-width:700px;
+  margin:40px auto;
+  padding:30px;
+  background:#2c2c3e;
+  border-radius:12px;
+  text-align:center;
+}
+
+body.light .container {
+  background:white;
+}
+
+/* DROP */
+.drop {
+  border:2px dashed #555;
+  padding:40px;
+  margin:20px;
+  cursor:pointer;
+}
+
+.drop.drag {
+  border-color:#4CAF50;
+  background:rgba(76,175,80,0.1);
+}
+
+.btn {
+  padding:12px 20px;
+  background:#4CAF50;
+  border:none;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.status {
+  margin-top:15px;
+  color:#bbb;
+}
+/* ✅ BAĞIMSIZ GERİ BUTONU (theme bozmaz) */
+#backBtnPlain {
+    background: transparent;
+    border: 1px solid #888;
+    color: inherit;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* hover */
+#backBtnPlain:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* light mode uyumu */
+body.light #backBtnPlain:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+/* PAGE SWITCH */
+.page-switch {
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-bottom:35px;
+  flex-wrap:wrap;
+}
+
+.switch-btn {
+  padding:14px 24px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:bold;
+  background:#444;
+  color:white;
+  transition:.3s;
+}
+
+.switch-btn:hover {
+  opacity:.9;
+}
+
+.switch-btn.active {
+  background:#4CAF50;
+}
+
+.hidden-page {
+  display:none;
+}
+
+/* BIG LABEL */
+.big-label {
+  display:block;
+  font-size:28px;
+  font-weight:bold;
+  margin-bottom:18px;
+  color:#4CAF50;
+}
+
+/* MANUAL RESULT */
+.manual-result {
+  margin-top:30px;
+  font-size:90px;
+  font-weight:bold;
+  color:#4CAF50;
+  text-shadow:0 0 20px rgba(76,175,80,0.4);
+}
+
+/* LOG AREA */
+.log-section {
+  margin-top:40px;
+  text-align:left;
+  background:rgba(255,255,255,0.05);
+  padding:20px;
+  border-radius:12px;
+}
+
+body.light .log-section {
+  background:rgba(0,0,0,0.05);
+}
+
+.log-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.log-list {
+  max-height:250px;
+  overflow:auto;
+  padding:10px;
+  border-radius:10px;
+  background:rgba(0,0,0,0.2);
+  line-height:1.8;
+}
+
+body.light .log-list {
+  background:white;
+}
+
+.log-item {
+  padding:8px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  font-size:16px;
+}
+
+.clear-btn {
+  background:#e53935;
+  color:white;
+  border:none;
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.clear-btn:hover {
+  opacity:.9;
+}
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+}
+
+.app{
+  display:flex;
+  height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  background:#111827;
+  padding:15px;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:15px;
+  overflow:auto;
+}
+
+/* KPI CARDS */
+.cards{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.card{
+  flex:1;
+  background:#1f2937;
+  padding:10px;
+  border-radius:10px;
+}
+
+/* DROP */
+#drop{
+  border:2px dashed #22c55e;
+  padding:20px;
+  text-align:center;
+  margin:10px 0;
+  cursor:pointer;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+td,th{
+  border:1px solid #333;
+  padding:5px;
+  font-size:12px;
+}

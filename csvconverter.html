@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>CSV Converter</title>
+
+<link rel="stylesheet" href="gorsel.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="header">
+  <div>📊 CSV Converter</div>
+
+  <div class="right">
+
+    <!-- ✅ BACK BUTTON (DOĞRU YER) -->
+    <button id="backBtnPlain">⬅ Geri</button>
+
+    <!-- ✅ DARK/LIGHT -->
+    <label class="switch">
+      <input type="checkbox" id="themeToggle">
+      <div class="slider"></div>
+      <span id="themeText">🌙 Dark</span>
+    </label>
+
+  </div>
+</div>
+
+<div class="container">
+  <h2>CSV → Excel</h2>
+
+  <div id="drop" class="drop">📥 Dosya seç veya sürükle</div>
+  <input type="file" id="fileInput" hidden>
+
+  <button id="downloadBtn" class="btn">⬇ Excel İndir</button>
+
+  <div id="status" class="status">Bekleniyor...</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

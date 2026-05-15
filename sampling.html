@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Sampling Final Ultimate</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<style>
+body{margin:0;font-family:Arial;background:#1e1e2f;color:white;transition:.3s}
+body.light{background:#f5f5f5;color:#222}
+.header{display:flex;justify-content:space-between;padding:15px;background:#2c2c3e}
+body.light .header{background:#ddd}
+.right{display:flex;gap:15px;align-items:center}
+.run-btn{background:#4CAF50;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer}
+.delete-btn{background:#f44336;color:white;border:none;border-radius:6px;padding:3px 7px;cursor:pointer}
+.switch{display:flex;gap:6px;font-size:12px}
+.switch input{display:none}
+.slider{width:40px;height:20px;background:#666;border-radius:20px;position:relative}
+.slider:before{content:"";width:16px;height:16px;background:white;position:absolute;top:2px;left:2px;border-radius:50%;transition:.3s}
+input:checked+.slider{background:#4CAF50}
+input:checked+.slider:before{transform:translateX(20px)}
+.actions{padding:15px;display:flex;gap:10px}
+.btn{padding:12px 18px;border:none;border-radius:8px;color:white;cursor:pointer}
+.add{background:#2196F3}
+.clear{background:#f44336}
+.grid{display:grid;grid-template-rows:repeat(2,auto);grid-auto-flow:column;gap:15px;padding:15px}
+.data-box{background:#2c2c3e;padding:15px;border-radius:10px;width:260px;position:relative}
+body.light .data-box{background:white}
+.drop{border:2px dashed #555;padding:10px;text-align:center;margin-bottom:10px;cursor:pointer;border-radius:6px}
+.drop.drag{border-color:#4CAF50;background:rgba(76,175,80,0.1)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{border:1px solid #444;padding:5px;text-align:center}
+input{width:60px}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<div>📊 Sampling Dashboard</div>
+
+<div class="right">
+<button class="run-btn" style="background:#555" onclick="goBack()">⬅ Geri</button>
+
+<label class="switch">
+<input type="checkbox" onchange="toggleTheme()">
+<div class="slider"></div>
+<span id="themeText">🌙 Dark</span>
+</label>
+
+<button class="run-btn" onclick="run()">🚀 Çalıştır</button>
+</div>
+</div>
+
+<div class="actions">
+<button class="btn add" onclick="addData()">➕ Data</button>
+<button class="btn clear" onclick="clearAll()">🗑 Temizle</button>
+</div>
+
+<div id="grid" class="grid"></div>
+
+<script>
+
+const SHOW_COLS=[
+"active_call_key",
+"agent_name",
+"agent_email",
+"queue_name",
+"call_date",
+"total_duration"
+];
+
+let datasets=[];
+
+function goBack(){window.location.href="index.html";}
+
+function toggleTheme(){
+document.body.classList.toggle("light");
+themeText.innerText=document.body.classList.contains("light")?"☀️ Light":"🌙 Dark";
+}
+
+function defaultTable(){
+return `
+<tr><th>Min</th><th>Max</th><th>Adet</th><th></th></tr>
+<tr><td><input value="45"></td><td><input value="90"></td><td><input value="2"></td><td><button class="delete-btn" onclick="removeRow(this)">✖</button></td></tr>
+<tr><td><input value="91"></td><td><input value="150"></td><td><input value="2"></td><td><button class="delete-btn" onclick="removeRow(this)">✖</button></td></tr>
+<tr><td><input value="151"></td><td><input value="239"></td><td><input value="2"></td><td><button class="delete-btn" onclick="removeRow(this)">✖</button></td></tr>
+<tr><td><input value="240"></td><td><input value="300"></td><td><input value="2"></td><td><button class="delete-btn" onclick="removeRow(this)">✖</button></td></tr>
+<tr><td colspan="4"><button onclick="addRow(this)">➕ Satır</button></td></tr>
+`;
+}
+
+function addData(){
+let id=Date.now();
+let box=document.createElement("div");
+box.className="data-box";
+
+box.innerHTML=`
+<button class="delete-btn" onclick="removeData(${id},this)">✖</button>
+<div class="drop">📂 Dosya seç veya sürükle</div>
+<input type="file" hidden>
+<table>${defaultTable()}</table>
+`;
+
+let input=box.querySelector("input");
+let drop=box.querySelector(".drop");
+
+drop.onclick=()=>input.click();
+
+drop.ondragover=e=>{e.preventDefault();drop.classList.add("drag");};
+drop.ondragleave=()=>drop.classList.remove("drag");
+
+drop.ondrop=e=>{
+e.preventDefault();
+drop.classList.remove("drag");
+let file=e.dataTransfer.files[0];
+if(file) loadFile(file,id,box);
+};
+
+input.onchange=e=>{
+loadFile(e.target.files[0],id,box);
+};
+
+grid.appendChild(box);
+datasets.push({id,data:[]});
+}
+
+function addRow(btn){
+let table=btn.closest("table");
+let row=table.insertRow(table.rows.length-1);
+
+row.innerHTML=`
+<td><input value="0"></td>
+<td><input value="0"></td>
+<td><input value="2"></td>
+<td><button class="delete-btn" onclick="removeRow(this)">✖</button></td>
+`;
+}
+
+function removeRow(btn){btn.closest("tr").remove();}
+function removeData(id,btn){btn.parentElement.remove();datasets=datasets.filter(d=>d.id!==id);}
+function clearAll(){datasets=[];grid.innerHTML="";}
+
+function loadFile(file,id,box){
+let reader=new FileReader();
+
+reader.onload=e=>{
+let wb=XLSX.read(e.target.result,{type:'array'});
+let data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+datasets.find(x=>x.id===id).data=data.filter(r=>!isNaN(r.total_duration));
+box.querySelector(".drop").innerText="✅ "+file.name;
+};
+
+reader.readAsArrayBuffer(file);
+}
+
+/* ✅ FIX 1: UTC kullan → tarih kaymaz */
+function normalizeDate(v){
+if(!v)return "";
+
+if(typeof v==="number"){
+let d = new Date(Math.round((v - 25569) * 86400 * 1000));
+return `${String(d.getUTCDate()).padStart(2,"0")}.${String(d.getUTCMonth()+1).padStart(2,"0")}.${d.getUTCFullYear()}`;
+}
+
+return String(v).split(" ")[0];
+}
+
+function getBestDate(r){
+let m={};r.forEach(x=>{if(!m[x.call_date])m[x.call_date]=0;m[x.call_date]++;});
+return Object.keys(m).sort((a,b)=>m[b]-m[a])[0]||"NoDate";
+}
+
+async function run(){
+
+let zip=new JSZip();
+let count=0;
+
+for(let i=0;i<datasets.length;i++){
+
+let ds=datasets[i];
+if(!ds.data.length)continue;
+
+let box = document.querySelectorAll(".data-box")[i];
+if(!box) continue;
+let rows=box.querySelectorAll("table tr");
+
+let results=[],logs=[];
+
+/* ✅ tarih normalize */
+ds.data.forEach(r=>r.call_date=normalizeDate(r.call_date));
+
+rows.forEach((row,i)=>{
+if(i===0||i===rows.length-1)return;
+
+let inp=row.querySelectorAll("input");
+let min=+inp[0].value,max=+inp[1].value,cnt=+inp[2].value;
+
+let filtered=ds.data.filter(r=>r.total_duration>=min&&r.total_duration<max);
+
+let map={};
+filtered.forEach(r=>{
+if(!map[r.agent_name])map[r.agent_name]=[];
+map[r.agent_name].push(r);
+});
+
+for(let a in map){
+let pool=map[a];
+let sel=pool.sort(()=>Math.random()-0.5).slice(0,cnt);
+
+sel.forEach(r=>results.push({...r,__range:`${min}-${max}sn`}));
+
+if(pool.length<cnt){
+logs.push({Agent:a,Süre:`${min}-${max}`,"Eksik":cnt-pool.length});
+}
+}
+});
+
+if(!results.length)continue;
+count++;
+
+let out=results.map(r=>{
+let row={AHT_Araligi:r.__range};
+
+SHOW_COLS.forEach(c=>{
+if(c==="call_date"){
+row[c]="'"+r[c]; // ✅ FIX 2: Excel değiştiremez
+}else{
+row[c]=r[c]??"";
+}
+});
+
+return row;
+});
+
+let wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(out,{skipHeader:false}),"Data");
+
+if(logs.length)
+XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(logs),"Log");
+
+let file = XLSX.write(wb,{bookType:"xlsx",type:"array",compression:true});
+zip.file(getBestDate(results)+"_Tur2.xlsx",file);
+}
+
+if(count===0){alert("Çıktı yok");return;}
+
+if(count===1){
+let fileName = Object.keys(zip.files)[0];
+let fileData = await zip.file(fileName).async("blob");
+saveAs(fileData, fileName);
+return;
+}
+
+let d=new Date();
+let name=`Sampling_${String(d.getDate()).padStart(2,'0')}_${String(d.getMonth()+1).padStart(2,'0')}_${d.getFullYear()}.zip`;
+
+let blob=await zip.generateAsync({type:"blob"});
+saveAs(blob,name);
+}
+
+addData();
+
+</script>
+</body>
+</html>

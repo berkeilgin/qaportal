@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>v14 Excel Parity Dashboard</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0f1115;
+color:#fff;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+padding:10px;
+background:#1a1d25;
+position:sticky;
+top:0;
+}
+
+.container{padding:10px;display:grid;gap:10px}
+
+.card{background:#1a1d25;padding:10px;border-radius:8px}
+
+.ai{
+white-space:pre-line;
+border-left:4px solid #00ffd5;
+padding:10px;
+background:#121826;
+}
+
+table{
+border-collapse:collapse;
+font-size:10px;
+width:100%;
+}
+
+td,th{
+border:1px solid #2a2f3a;
+padding:3px;
+text-align:center;
+}
+
+th{position:sticky;top:0;background:#111}
+
+input,button{
+background:#222;
+color:#fff;
+border:1px solid #333;
+padding:5px;
+}
+
+button{cursor:pointer}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+<div>📊 v14 Excel Parity Engine</div>
+
+<div>
+<input id="projectName" placeholder="Proje adı">
+<button onclick="run()">Run</button>
+<button onclick="exportExcel()">Export</button>
+<input type="file" id="fileInput">
+</div>
+</div>
+
+<div class="container">
+
+<div id="aiBox" class="ai"></div>
+
+<div class="card">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="card" id="table"></div>
+
+</div>
+
+<script src="corelscript.js"></script>
+</body>
+</html>

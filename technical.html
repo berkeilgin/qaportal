@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Maintenance</title>
+</head>
+
+<body style="background:#111;color:white;text-align:center;padding-top:100px">
+
+<h1>🔧 Güncelleme Yapılıyor</h1>
+
+<p>
+Verdiğimiz rahatsızlık nedeniyle özür dileriz. Sistem güncelleniyor.
+Kısa süre içinde tekrar aktif olacaktır.
+</p>
+
+<p>
+<span id="s">15</span> saniye içinde kontrol edilecek
+</p>
+
+<script>
+let m = JSON.parse(localStorage.getItem("maintenance")||"{}");
+
+if(!m.active){
+  location.href="index.html";
+}
+
+let t = Number(m.refresh || 15);
+
+const el = document.getElementById("s");
+
+const timer = setInterval(()=>{
+
+  t--;
+  if(el) el.innerText = t;
+
+  if(t<=0){
+    location.reload();
+  }
+
+},1000);
+</script>
+
+</body>
+</html>
