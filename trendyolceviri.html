@@ -7,16 +7,50 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
+
 body {
   margin:0;
   font-family:Arial;
   background:#1e1e2f;
   color:white;
+  transition:0.3s;
+}
+
+/* LIGHT MODE */
+body.light{
+  background:#f4f4f4;
+  color:#222;
+}
+
+body.light .header,
+body.light .container{
+  background:white;
+  color:#222;
+}
+
+body.light .loader{
+  background:#ddd;
+  color:#222;
 }
 
 .header {
-  padding:15px;
+  padding:15px 20px;
   background:#2c2c3e;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.right{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 .container {
@@ -28,7 +62,8 @@ body {
   text-align:center;
 }
 
-.btn {
+.btn,
+.run-btn {
   padding:12px 20px;
   background:#4CAF50;
   border:none;
@@ -53,12 +88,74 @@ body {
   100% {opacity:0.5}
 }
 
+/* DARK LIGHT SWITCH */
+.switch{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.switch input{
+  display:none;
+}
+
+.slider{
+  width:45px;
+  height:24px;
+  background:#666;
+  border-radius:30px;
+  position:relative;
+  transition:.3s;
+}
+
+.slider::before{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:white;
+  border-radius:50%;
+  top:3px;
+  left:3px;
+  transition:.3s;
+}
+
+.switch input:checked + .slider::before{
+  transform:translateX(21px);
+}
+
+.switch input:checked + .slider{
+  background:#4CAF50;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="header">📊 Trendyol CSV Tool</div>
+<div class="header">
+
+  <div class="left">
+    📊 Trendyol CSV Tool
+  </div>
+
+  <div class="right">
+
+    <button class="run-btn" style="background:#555" onclick="goBack()">
+      ⬅ Geri
+    </button>
+
+    <label class="switch">
+      <input type="checkbox" onchange="toggleTheme()">
+      <div class="slider"></div>
+      <span id="themeText">🌙 Dark</span>
+    </label>
+
+  </div>
+
+</div>
 
 <div class="container">
 
@@ -87,33 +184,82 @@ var data1 = [];
 var data2 = [];
 var detayLoaded = false;
 
-// ✅ SERIAL DATE → JS DATE
-function excelDateToJSDate(serial) {
-  return new Date((serial - 25569) * 86400 * 1000);
+// ================= THEME =================
+function toggleTheme(){
+  document.body.classList.toggle("light");
+
+  themeText.innerText =
+    document.body.classList.contains("light")
+      ? "☀️ Light"
+      : "🌙 Dark";
 }
 
-// ✅ UNIVERSAL DATE FIX
+// ================= BACK =================
+function goBack(){
+  window.location.href = "index.html";
+}
+
+// ================= TURKEY DATE FIX =================
+
+// Excel serial date → JS Date
+function excelDateToJSDate(serial){
+
+  // Excel başlangıcı UTC bazlı
+  const utc_days = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400;
+
+  const date_info = new Date(utc_value * 1000);
+
+  const fractional_day = serial - Math.floor(serial) + 0.0000001;
+
+  let totalSeconds = Math.floor(86400 * fractional_day);
+
+  const seconds = totalSeconds % 60;
+  totalSeconds -= seconds;
+
+  const hours = Math.floor(totalSeconds / (60 * 60));
+  const minutes = Math.floor(totalSeconds / 60) % 60;
+
+  // ✅ Türkiye saatine göre düzeltme (+3)
+  date_info.setHours(hours + 3);
+  date_info.setMinutes(minutes);
+  date_info.setSeconds(seconds);
+
+  return date_info;
+}
+
+// UNIVERSAL DATE FIX
 function parseDate(val){
 
   if(!val) return "";
 
-  // ✅ Excel number
+  // Excel numeric date
   if(!isNaN(val)){
     let d = excelDateToJSDate(Number(val));
     return formatDateTR(d);
   }
 
-  // ✅ String parse
+  // String parse
   let d = new Date(val);
 
   if(!isNaN(d)){
+
+    // ✅ Türkiye timezone düzeltmesi
+    d = new Date(
+      d.toLocaleString("en-US", {
+        timeZone: "Europe/Istanbul"
+      })
+    );
+
     return formatDateTR(d);
   }
 
   return val;
 }
 
+// FORMAT DATE
 function formatDateTR(d){
+
   let day = String(d.getDate()).padStart(2,'0');
   let month = String(d.getMonth()+1).padStart(2,'0');
   let year = d.getFullYear();
@@ -124,13 +270,14 @@ function formatDateTR(d){
   return `${day}.${month}.${year} ${h}:${m}`;
 }
 
-// ✅ NUMBER SAFE
+// NUMBER SAFE
 function toNumber(val){
   return Number(String(val).replace(",", ".")) || 0;
 }
 
-// ✅ STATUS
+// STATUS
 function updateStatus(){
+
   document.getElementById("status").innerText =
     `Özet: ${data1.length} | Detay: ${data2.length}`;
 }
@@ -141,28 +288,32 @@ file1.addEventListener('change', async (e)=>{
   document.getElementById("loader1").style.display = "block";
 
   data1 = [];
+
   const files = Array.from(e.target.files);
 
   for(const f of files){
 
     const buffer = await f.arrayBuffer();
+
     const wb = XLSX.read(buffer);
 
     let rows = XLSX.utils.sheet_to_json(
-      wb.Sheets[wb.SheetNames[0]], { defval:"" }
+      wb.Sheets[wb.SheetNames[0]],
+      { defval:"" }
     );
 
     rows = rows
-      .filter(r=> r["Iptal"]==="Hayır")
-      .map(r=>{
+      .filter(r => r["Iptal"] === "Hayır")
+      .map(r => {
 
         let obj = {};
 
         for(let k in r){
+
           let val = r[k];
 
           if(k.includes("Tarih")){
-            val = parseDate(val); // ✅ FIX
+            val = parseDate(val);
           }
 
           obj[k] = val;
@@ -194,43 +345,45 @@ file2.addEventListener('change', async (e)=>{
   for(const f of files){
 
     const buffer = await f.arrayBuffer();
+
     const wb = XLSX.read(buffer);
 
     let rows = XLSX.utils.sheet_to_json(
-      wb.Sheets[wb.SheetNames[0]], { defval:"" }
+      wb.Sheets[wb.SheetNames[0]],
+      { defval:"" }
     );
 
     rows = rows
-      .map(r=>{
+      .map(r => {
 
         let obj = {};
 
-for(let k in r){
+        for(let k in r){
 
-  let val = r[k];
+          let val = r[k];
 
-  // ✅ CEVAP + SORU KOLONU TEMİZLİK
-  if(k === "Cevap" || k === "Soru"){
-    val = String(val || "")
-      .replace(/\s+/g, " ")       // fazla boşlukları teke indir
-      .replace(/^\s+|\s+$/g, ""); // baş/son trim
-  }
+          // CEVAP + SORU TEMİZLİK
+          if(k === "Cevap" || k === "Soru"){
 
-  // ✅ TARİH
-  if(k.includes("Tarih")){
-    val = parseDate(val);
-  }
+            val = String(val || "")
+              .replace(/\s+/g, " ")
+              .replace(/^\s+|\s+$/g, "");
+          }
 
-  obj[k] = val;
-}
+          // TARİH
+          if(k.includes("Tarih")){
+            val = parseDate(val);
+          }
 
+          obj[k] = val;
+        }
 
         obj.Puan = toNumber(obj.Puan);
         obj.Sure = toNumber(obj.Sure);
 
         return obj;
       })
-      .filter(r=> r["Iptal"]==="Hayır");
+      .filter(r => r["Iptal"] === "Hayır");
 
     data2 = data2.concat(rows);
   }
@@ -273,8 +426,17 @@ function exportAll(){
       "Detay Data"
     );
 
-    let d = new Date();
-    let fileName = `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}_TrendyolMPData.xlsx`;
+    // ✅ Türkiye saatiyle dosya tarihi
+    let trNow = new Date(
+      new Date().toLocaleString("en-US", {
+        timeZone: "Europe/Istanbul"
+      })
+    );
+
+    let fileName =
+      `${String(trNow.getDate()).padStart(2,'0')}-` +
+      `${String(trNow.getMonth()+1).padStart(2,'0')}-` +
+      `${trNow.getFullYear()}_TrendyolMPData.xlsx`;
 
     XLSX.writeFile(wb, fileName);
 
@@ -285,6 +447,7 @@ function exportAll(){
 
 // ================= RESET =================
 function resetAll(){
+
   data1 = [];
   data2 = [];
   detayLoaded = false;
