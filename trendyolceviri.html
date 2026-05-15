@@ -88,6 +88,7 @@ var data2 = [];
 var detayLoaded = false;
 
 // ✅ SERIAL DATE → JS DATE
+
 function excelDateToJSDate(serial) {
 
   const excelEpoch = new Date(1899, 11, 30);
@@ -99,6 +100,7 @@ function excelDateToJSDate(serial) {
 
   return new Date(excelEpoch.getTime() + days * 86400 * 1000 + ms);
 }
+
 
 // ✅ UNIVERSAL DATE FIX
 function parseDate(val){
@@ -134,7 +136,7 @@ function formatDateTR(d){
 
   const get = (t) => tr.find(x => x.type === t)?.value;
 
-  return `${get("day")}.${get("month")}.${get("year")} ${get("hour")}:${get("minute")}`;
+return "'" + `${get("day")}.${get("month")}.${get("year")} ${get("hour")}:${get("minute")}`;
 }
   
 // ✅ NUMBER SAFE
