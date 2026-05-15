@@ -204,7 +204,6 @@ function goBack(){
 // Excel serial date → JS Date
 function excelDateToJSDate(serial){
 
-  // Excel başlangıcı UTC bazlı
   const utc_days = Math.floor(serial - 25569);
   const utc_value = utc_days * 86400;
 
@@ -220,8 +219,8 @@ function excelDateToJSDate(serial){
   const hours = Math.floor(totalSeconds / (60 * 60));
   const minutes = Math.floor(totalSeconds / 60) % 60;
 
-  // ✅ Türkiye saatine göre düzeltme (+3)
-  date_info.setHours(hours + 3);
+  // ✅ Fazladan +3 kaldırıldı
+  date_info.setHours(hours);
   date_info.setMinutes(minutes);
   date_info.setSeconds(seconds);
 
